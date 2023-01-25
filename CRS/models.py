@@ -42,9 +42,8 @@ class Question(models.Model):
 
     # define type of question
     LONG = 'LQ'
-    SHORT = 'SQ'
     MULTIPLECHOICES = 'MC'
-    TYPE_CHOICES = [(LONG, 'Long Question'), (SHORT, 'Short Question'),
+    TYPE_CHOICES = [(LONG, 'Long Question'),
                     (MULTIPLECHOICES, 'Multiple Choice')]
     type = models.CharField(
         max_length=2, choices=TYPE_CHOICES, default=MULTIPLECHOICES)
