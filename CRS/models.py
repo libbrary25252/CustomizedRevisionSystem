@@ -3,6 +3,7 @@ import os
 import datetime
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+
 # Create models
 
 
@@ -29,7 +30,8 @@ class Role(models.Model):
 
 
 class Question(models.Model):
-    # def img_directory_path(instance, filename):
+    # def img_directory_path(folder, filename):
+    #     return os.path.join(folder, filename)
     #     ext = filename.split('.')[-1]
     #     filename = '{}.{}'.format(uuid.uuid4().hex[:10], ext)
     #     return os.path.join(instance.question_id, "img", filename)
@@ -37,15 +39,33 @@ class Question(models.Model):
         primary_key=True, default=uuid.uuid4, editable=False)
     question_string = models.TextField()
     year = models.IntegerField(blank=True, null=True)
-    type = models.CharField(max_length=30)
+
+    # define type of question
+    LONG = 'LQ'
+    SHORT = 'SQ'
+    MULTIPLECHOICES = 'MC'
+    TYPE_CHOICES = [(LONG, 'Long Question'), (SHORT, 'Short Question'),
+                    (MULTIPLECHOICES, 'Multiple Choice')]
+    type = models.CharField(
+        max_length=2, choices=TYPE_CHOICES, default=MULTIPLECHOICES)
+
+    def is_upperclass(self):
+        return self.type in {self.LONG, self.MULTIPLECHOICES}
+
     image = models.ImageField(
         upload_to="uploads/questions/", height_field=None, width_field=None, max_length=100, blank=True, null=True)
     options = models.JSONField("QuestionOptions", null=True, blank=True)
     answer = models.TextField()
-    category = models.ForeignKey("Category", on_delete=models.PROTECT)
+    # category = models.ForeignKey("Category", on_delete=models.PROTECT)
+
+
+class QuestionCategory(models.Model):
+    Qid = models.OneToOneField(Question, on_delete=models.PROTECT)
+    Cid = models.ForeignKey("Category", on_delete=models.CASCADE)
 
 
 class Category(models.Model):
     c_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
+    c_name = models.CharField(max_length=30, default='c001')
     description = models.TextField()
