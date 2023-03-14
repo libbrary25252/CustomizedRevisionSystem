@@ -10,7 +10,7 @@
     </a>
   </div>
 
-  <div id="navbar_menu" class="navbar-menu" v-bind:class="{'is-active': showMobileMenu}">
+  <div id="navbar_menu" class="navbar-menu" v-bind:class="{'is-active': isMobile()}">
     <div class="navbar-start">
       <router-link to="/home" class="navbar-item">
         Home
@@ -104,8 +104,9 @@ export default {
     }
   },
   computed: {
+    
     dropdownClasses: function() {
-      if (this.isActive && this.showMobileMenu) {
+      if (this.isActive) {
         return "is-active";
       } else {
         return "is-hidden-touch";
@@ -115,6 +116,10 @@ export default {
   methods:{
     show: function() {
       this.isActive = !this.isActive;
+    },
+    isMobile: function() {
+      if(this.showMobileMenu) this.isActive = false;
+      return !this.showMobileMenu;
     }
   }
 }
