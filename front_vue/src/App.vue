@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
-    <router-link to="/" class="navbar-item"><strong>Smart Campus</strong></router-link>
+    <router-link to="/home" class="navbar-item"><strong>Smart Campus</strong></router-link>
 
     <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar_menu" @click="showMobileMenu = !showMobileMenu">
       <span aria-hidden="true"></span>
@@ -16,12 +16,13 @@
         Home
       </router-link>
 
-      <div class="navbar-item has-dropdown is-hoverable">
+      
+      <div class="navbar-item has-dropdown is-hoverable dropdown-trigger  ">
         <a class="navbar-link">
           CRS
         </a>
 
-        <div class="navbar-dropdown">
+        <div class="navbar-dropdown ">
           <router-link to="/createQList" class="navbar-item">
             Question List
           </router-link>
@@ -99,6 +100,7 @@ export default {
     data() {
       return {
         showMobileMenu: false,
+        // isActive: false,
     }
   }
 }

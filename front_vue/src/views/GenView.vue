@@ -2,14 +2,14 @@
     <div class="Gen">
       Gen uwu
     </div>
-  </template>
+</template>
   
-  <script>
+<script>
   export default {
     name: 'GenView',
     components: {
     
     }
   }
-  </script>
+ </script>
   

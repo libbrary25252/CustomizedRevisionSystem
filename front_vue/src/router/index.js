@@ -3,8 +3,8 @@ import HomeView from '../views/HomeView.vue'
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
+    path: '/home',
+    name: 'logo',
     component: HomeView
   },
   {
@@ -24,7 +24,22 @@ const routes = [
     path: '/report',
     name: 'Report issue',
     component: () => import('../views/ReportView.vue')
-  }
+  },
+  {
+    path: '/activity',
+    name: 'Activity',
+    component: () => import('../views/ActivityView.vue')
+  },
+  {
+    path: '/profile',
+    name: 'User Profile',
+    component: () => import('../views/ProfileView.vue')
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/LoginView.vue')
+  },
 ]
 
 const router = createRouter({
