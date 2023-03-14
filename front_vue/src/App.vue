@@ -45,7 +45,7 @@
     <div class="navbar-end">
       <div class="navbar-item">
         <div class="buttons">
-          <router-link to="/profile" class="button is-primary">
+          <router-link to="/profile" class="button is-info">
             <strong>Profile</strong>
           </router-link>
           <router-link to="/login" class="button is-light">
