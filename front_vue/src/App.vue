@@ -17,12 +17,12 @@
       </router-link>
 
       
-      <div class="navbar-item has-dropdown is-hoverable dropdown-trigger  ">
+      <div class="navbar-item has-dropdown is-hoverable" @click="show()">
         <a class="navbar-link">
           CRS
         </a>
 
-        <div class="navbar-dropdown ">
+        <div class="navbar-dropdown" :class="dropdownClasses">
           <router-link to="/createQList" class="navbar-item">
             Question List
           </router-link>
@@ -100,7 +100,21 @@ export default {
     data() {
       return {
         showMobileMenu: false,
-        // isActive: false,
+        isActive: false,
+    }
+  },
+  computed: {
+    dropdownClasses: function() {
+      if (this.isActive && this.showMobileMenu) {
+        return "is-active";
+      } else {
+        return "is-hidden-touch";
+      }
+    }
+  },
+  methods:{
+    show: function() {
+      this.isActive = !this.isActive;
     }
   }
 }
