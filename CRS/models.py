@@ -37,7 +37,8 @@ class Question(models.Model):
     #     filename = '{}.{}'.format(uuid.uuid4().hex[:10], ext)
     #     return os.path.join(instance.question_id, "img", filename)
     QID = models.BigIntegerField(primary_key=True)
-    parentQID = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    parentQID = models.ForeignKey(
+        'self', on_delete=models.CASCADE, blank=True, null=True)
     statement = models.TextField(blank=True, null=True)
     string = models.TextField()
     # year = models.IntegerField(blank=True, null=True)
@@ -54,36 +55,39 @@ class Question(models.Model):
         return self.type in {self.LONG, self.MULTIPLECHOICES}
 
     image = models.ImageField(
-        upload_to="uploads/questions/", height_field=None, width_field=None, max_length=100, blank=True, null=True) #name it by qid
+        upload_to="uploads/questions/", height_field=None, width_field=None, max_length=100, blank=True, null=True)  # name it by qid
     description = models.TextField(null=True, blank=True)
     options = models.TextField(null=True, blank=True)
 
     CATER_CHOICE = (
-                 ('ALGO', 'Algorithm Design'),
-                 ('BMO','Basic Machine Organisation'),
-                 ('COM','Computer System'),
-                 ('DM','Data Manipulation and Analysis'),
-                 ('DO','Data Organisation and Data Control'),
-                 ('ELEWEB','Elementary Web Authoring'),
-                 ('HEALTH','Health and Ethical Issues'),
-                 ('INFO','Information Processing'),
-                 ('IP','Intellectual Property'),
-                 ('NETSEV','Internet Services and Applications'),
-                 ('MEDIA','Multimedia Elements'),
-                 ('NETBAS','Networking and Internet Basics'),
-                 ('PROGRAM','Program Development'),
-                 ('SD','Spreadsheets and Databases'),
-                 ('THREAT','Threats and Security on the Internet'))
-    category = MultiSelectField(choices=CATER_CHOICE, max_length=10, null=True, blank=True)
-    
+        ('ALGO', 'Algorithm Design'),
+        ('BMO', 'Basic Machine Organisation'),
+        ('COM', 'Computer System'),
+        ('DM', 'Data Manipulation and Analysis'),
+        ('DO', 'Data Organisation and Data Control'),
+        ('ELEWEB', 'Elementary Web Authoring'),
+        ('HEALTH', 'Health and Ethical Issues'),
+        ('INFO', 'Information Processing'),
+        ('IP', 'Intellectual Property'),
+        ('NETSEV', 'Internet Services and Applications'),
+        ('MEDIA', 'Multimedia Elements'),
+        ('NETBAS', 'Networking and Internet Basics'),
+        ('PROGRAM', 'Program Development'),
+        ('SD', 'Spreadsheets and Databases'),
+        ('THREAT', 'Threats and Security on the Internet'))
+    category = MultiSelectField(
+        choices=CATER_CHOICE, max_length=10, null=True, blank=True)
+
     def __str__(self):
         return str(self.QID)
 
+
 class QuestionQuestion(models.Model):
-    question_id = models.UUIDField(
+    state_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False)
     statement = models.TextField(blank=True, null=True)
-    # Cid = models.ForeignKey("Category", on_delete=models.CASCADE)
+    qid = models.ForeignKey(
+        "Question", on_delete=models.CASCADE, null=True, blank=True)
 
 
 # class Category(models.Model):
