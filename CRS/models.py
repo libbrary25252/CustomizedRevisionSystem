@@ -55,8 +55,8 @@ class Question(models.Model):
 
     image = models.ImageField(
         upload_to="uploads/questions/", height_field=None, width_field=None, max_length=100, blank=True, null=True) #name it by qid
-    description = models.JSONField("QuestionDescription", null=True, blank=True)
-    options = models.JSONField("QuestionOptions", null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
+    options = models.TextField(null=True, blank=True)
 
     CATER_CHOICE = (
                  ('ALGO', 'Algorithm Design'),
