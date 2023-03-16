@@ -1,7 +1,13 @@
 from rest_framework import serializers
-# from .models import Category
+from .models import User, Question, QuestionQuestion
 
-# class CategorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Category
-#         fields = ['c_id', 'c_name', 'description']
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ['QID', 'parentQID', 'statement', 'string', 'Qtype', 'image', 
+                  'description', 'options', 'category']
+
+class ContainerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuestionQuestion
+        field = ['state_id', 'statement', 'qid']

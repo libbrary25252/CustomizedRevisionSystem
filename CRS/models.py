@@ -48,7 +48,7 @@ class Question(models.Model):
     MULTIPLECHOICES = 'MC'
     TYPE_CHOICES = [(LONG, 'Long Question'),
                     (MULTIPLECHOICES, 'Multiple Choice')]
-    type = models.CharField(
+    Qtype = models.CharField(
         max_length=2, choices=TYPE_CHOICES, default=MULTIPLECHOICES)
 
     def is_upperclass(self):
@@ -76,7 +76,7 @@ class Question(models.Model):
         ('SD', 'Spreadsheets and Databases'),
         ('THREAT', 'Threats and Security on the Internet'))
     category = MultiSelectField(
-        choices=CATER_CHOICE, max_length=10, null=True, blank=True)
+        choices=CATER_CHOICE, max_length=50, null=True, blank=True)
 
     def __str__(self):
         return str(self.QID)
