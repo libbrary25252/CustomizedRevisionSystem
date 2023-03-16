@@ -48,8 +48,8 @@ class QuestionAPI(APIView):
         serializer = QuestionSerializer(new_question)
         return Response(serializer.data)
     
-    class ContainerAPI(APIView):
-        serializer_class = ContainerSerializer
+class ContainerAPI(APIView):
+    serializer_class = ContainerSerializer
 
     def get_queryset(self):
         containers = QuestionQuestion.objects.all()
@@ -77,7 +77,7 @@ class QuestionAPI(APIView):
     
     def post(self, request, *args, **kwargs):
         container_data = request.data
-        new_container = Question.objects.create(state_id=container_data["state_id"], statement=container_data["statement"], qid=container_data["qid"])
+        new_container = QuestionQuestion.objects.create(state_id=container_data["state_id"], statement=container_data["statement"], qid=container_data["qid"])
         new_container.save()
         serializer = ContainerSerializer(new_container)
         return Response(serializer.data)

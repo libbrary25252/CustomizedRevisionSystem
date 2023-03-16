@@ -10,4 +10,4 @@ class QuestionSerializer(serializers.ModelSerializer):
 class ContainerSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionQuestion
-        field = ['state_id', 'statement', 'qid']
+        fields = ['state_id', 'statement', 'qid']
