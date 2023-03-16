@@ -1,10 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Question, QuestionQuestion
+from .models import Question, QuestionQuestion, QuestionInput
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import uuid
-from .serializers import QuestionSerializer, ContainerSerializer
+from .serializers import QuestionSerializer, ContainerSerializer, InputSerializer
 
 def home(request):
     return render(request, 'home.html', {'name': 'Hello'})
@@ -80,4 +80,38 @@ class ContainerAPI(APIView):
         new_container = QuestionQuestion.objects.create(state_id=container_data["state_id"], statement=container_data["statement"], qid=container_data["qid"])
         new_container.save()
         serializer = ContainerSerializer(new_container)
+        return Response(serializer.data)
+    
+class ModelInputAPI(APIView):
+    serializer_class = InputSerializer
+
+    def get_queryset(self):
+        quesinputs = QuestionInput.objects.all()
+        return quesinputs
+
+    def get(self, request, *args, **kwargs):
+        try:
+            uid = request.query_param["uid"]
+            text = request.query_param["text"]
+            result = request.query_param["result"]
+            
+            if uid != None:
+                uid = QuestionInput.objects.get(uid=uid)
+                serializer = InputSerializer(uid)
+            if text != None:
+                text = QuestionInput.objects.get(text=text)
+                serializer = InputSerializer(text)
+            if result != None:
+                result = QuestionInput.objects.get(result=result)
+                serializer = InputSerializer(result)
+        except:
+            quesinputs = self.get_queryset()
+            serializer = InputSerializer(quesinputs, many=True) #get all
+        return Response(serializer.data)
+
+    def post(self, request, *args, **kwargs):
+        input_data = request.data
+        new_input = QuestionInput.objects.create(uid=input_data["uid"], text=input_data["text"], result=input_data["result"])
+        new_input.save()
+        serializer = InputSerializer(new_input)
         return Response(serializer.data)

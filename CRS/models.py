@@ -1,6 +1,4 @@
 import uuid
-import os
-import datetime
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 from multiselectfield import MultiSelectField
@@ -9,6 +7,7 @@ from multiselectfield import MultiSelectField
 
 
 class User(models.Model):
+    user_id = models.CharField(max_length=6, default='st0001')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
@@ -89,6 +88,10 @@ class QuestionQuestion(models.Model):
     qid = models.ForeignKey(
         "Question", on_delete=models.CASCADE, null=True, blank=True)
 
+class QuestionInput(models.Model):
+    uid = models.CharField(max_length=6, default='st0001')
+    text = models.TextField()
+    result = models.CharField(max_length=1000, null=True)
 
 # class Category(models.Model):
 #     c_id = models.UUIDField(
