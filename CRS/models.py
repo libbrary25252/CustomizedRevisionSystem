@@ -88,10 +88,11 @@ class QuestionQuestion(models.Model):
     qid = models.ForeignKey(
         "Question", on_delete=models.CASCADE, null=True, blank=True)
 
+
 class QuestionInput(models.Model):
     uid = models.CharField(max_length=6, default='st0001')
     text = models.TextField()
-    result = models.CharField(max_length=1000, null=True)
+    result = models.CharField(max_length=1000, null=True, blank=True)
 
 # class Category(models.Model):
 #     c_id = models.UUIDField(
