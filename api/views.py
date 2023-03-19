@@ -1,51 +1,58 @@
 # Import necessary libraries
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
-import pickle
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import render
 from CRS.views import ModelInputAPI
 import numpy as np
 
-model_path = "ml_model\distlBert-model-v8"
+model_path = "./ml_model/distlBert-model-v8"
+
+model_labels = ['Algorithm Design',
+                'Basic Machine Organisation',
+                'Computer System',
+                'Data Manipulation and Analysis',
+                'Data Organisation and Data Control',
+                'Elementary Web Authoring',
+                'Health and Ethical Issues',
+                'Information Processing',
+                'Intellectual Property',
+                'Internet Services and Applications',
+                'Multimedia Elements',
+                'Networking and Internet Basics',
+                'Program Development',
+                'Spreadsheets and Databases',
+                'Threats and Security on the Internet']
+id2label = {idx: label for idx, label in enumerate(model_labels)}
+label2id = {label: idx for idx, label in enumerate(model_labels)}
 
 
 class ModelAPI(APIView):
     def post(self, request):
         # load the model
-        model = AutoModelForSequenceClassification.from_pretrained(model_path)
+        model = AutoModelForSequenceClassification.from_pretrained(
+            model_path, local_files_only=True)
         tokenizer = AutoTokenizer.from_pretrained(model_path)
-
-        # get input text from database
+        # model.to('cuda')
+        # data = request.data
+        # text = data["text"]
+        # print(text)
 
         try:
-            age = request.data.get('age', None)
-            bs_fast = request.data.get('bs_fast', None)
-            bs_pp = request.data.get('bs_pp', None)
-            plasma_r = request.data.get('plasma_r', None)
-            plasma_f = request.data.get('plasma_f', None)
-            hbA1c = request.data.get('hbA1c', None)
-            fields = [age, bs_fast, bs_pp, plasma_r, plasma_f, hbA1c]
-            if not None in fields:
-                # Datapreprocessing Convert the values to float
-                age = float(age)
-                bs_fast = float(bs_fast)
-                bs_pp = float(bs_pp)
-                plasma_r = float(plasma_r)
-                plasma_f = float(plasma_f)
-                hbA1c = float(hbA1c)
-                result = [age, bs_fast, bs_pp, plasma_r, plasma_f, hbA1c]
-                # Passing data to model & loading the model from disks
-                model_path = 'ml_model/model.pkl'
-                classifier = pickle.load(open(model_path, 'rb'))
-                prediction = classifier.predict([result])[0]
-                conf_score = np.max(classifier.predict_proba([result]))*100
+            data = request.data
+            text = data["text"]
+            print('\nposted data: ' + text)
+            if text != None:
+                # tokenize the text for loading into model
+                encoding = encodeText(tokenizer, model, text)
+                output = model(**encoding)
+                logits = output.logits
+                result = showPredictions(logits)
                 predictions = {
                     'error': '0',
                     'message': 'Successfull',
-                    'prediction': prediction,
-                    'confidence_score': conf_score
+                    'prediction': result,
                 }
             else:
                 predictions = {
@@ -59,3 +66,20 @@ class ModelAPI(APIView):
             }
 
         return Response(predictions)
+
+
+def encodeText(tokenizer, model, data):
+    encoding = tokenizer(data, return_tensors="pt")
+    encoding = {k: v.to(model.device) for k, v in encoding.items()}
+    return encoding
+
+
+def showPredictions(logits):
+    sigmoid = torch.nn.Sigmoid()
+    probs = sigmoid(logits.squeeze().cpu())
+    predictions = np.zeros(probs.shape)
+    predictions[np.where(probs >= 0.5)] = 1
+    # turn predicted id's into actual label names
+    predicted_labels = [id2label[idx]
+                        for idx, label in enumerate(predictions) if label == 1.0]
+    return predicted_labels

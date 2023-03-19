@@ -75,14 +75,23 @@ export default {
 
       for (var i = 0; i < this.formData.length; i++) {
         console.log({ i })
-        console.log(this.formData[i].uid)
-        await axios.post('http://127.0.0.1:8000/CRS/inputs', this.formData[i]).then(response => {
+        console.log(this.formData[i].text)
+        // await axios.post('http://127.0.0.1:8000/CRS/inputs', this.formData[i]).then(response => {
+        //   console.log(response.data);
+        // })
+        //   .catch(error => {
+        //     console.log(error);
+        //   });
+
+        await axios.post('http://127.0.0.1:8000/api/model/', { 'text': this.formData[i].text }).then(response => {
           console.log(response.data);
         })
           .catch(error => {
             console.log(error);
           });
       }
+      // reset the array
+      this.formData = [];
     }
   }
 }

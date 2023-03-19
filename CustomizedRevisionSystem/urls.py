@@ -22,5 +22,6 @@ urlpatterns = [
     path('CRS/', include('CRS.urls')),
     path('api/v1/', include('djoser.urls')),
     path('api/v1/', include('djoser.urls.authtoken')),
+    path('api/', include('api.urls')),
     path('__debug__/', include('debug_toolbar.urls')),
 ]
