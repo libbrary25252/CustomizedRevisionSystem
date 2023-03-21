@@ -4,10 +4,22 @@ from .models import Question, QuestionQuestion, QuestionInput
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import uuid
+import datetime
 from .serializers import QuestionSerializer, ContainerSerializer, InputSerializer
+
 
 def home(request):
     return render(request, 'home.html', {'name': 'Hello'})
+
+
+def genSeqID(uid, sequence):
+    time = datetime.datetime.now()
+    str_time = str(time).replace("-", "").replace(" ", "").replace(":", "")
+    str_time = str_time[:str_time.rfind('.')]
+    res = uid + "-" + str_time + "-" + str(sequence)
+    print(res)
+    return res
+
 
 class QuestionAPI(APIView):
     serializer_class = QuestionSerializer
@@ -38,16 +50,18 @@ class QuestionAPI(APIView):
                 serializer = QuestionSerializer(Qtype)
         except:
             questions = self.get_queryset()
-            serializer = QuestionSerializer(questions, many=True) #get all
+            serializer = QuestionSerializer(questions, many=True)  # get all
         return Response(serializer.data)
-    
+
     def post(self, request, *args, **kwargs):
         question_data = request.data
-        new_question = Question.objects.create(QID=question_data["QID"], statement=question_data["statement"], string=question_data["string"], Qtype=question_data["Qtype"], description=question_data["description"], options=question_data["options"])
+        new_question = Question.objects.create(QID=question_data["QID"], statement=question_data["statement"], string=question_data["string"],
+                                               Qtype=question_data["Qtype"], description=question_data["description"], options=question_data["options"])
         new_question.save()
         serializer = QuestionSerializer(new_question)
         return Response(serializer.data)
-    
+
+
 class ContainerAPI(APIView):
     serializer_class = ContainerSerializer
 
@@ -60,7 +74,7 @@ class ContainerAPI(APIView):
             state_id = request.query_param["state_id"]
             statement = request.query_param["statement"]
             qid = request.query_param["qid"]
-            
+
             if state_id != None:
                 state_id = QuestionQuestion.objects.get(state_id=state_id)
                 serializer = ContainerSerializer(state_id)
@@ -72,16 +86,18 @@ class ContainerAPI(APIView):
                 serializer = ContainerSerializer(qid)
         except:
             containers = self.get_queryset()
-            serializer = ContainerSerializer(containers, many=True) #get all
+            serializer = ContainerSerializer(containers, many=True)  # get all
         return Response(serializer.data)
-    
+
     def post(self, request, *args, **kwargs):
         container_data = request.data
-        new_container = QuestionQuestion.objects.create(state_id=container_data["state_id"], statement=container_data["statement"], qid=container_data["qid"])
+        new_container = QuestionQuestion.objects.create(
+            state_id=container_data["state_id"], statement=container_data["statement"], qid=container_data["qid"])
         new_container.save()
         serializer = ContainerSerializer(new_container)
         return Response(serializer.data)
-    
+
+
 class ModelInputAPI(APIView):
     serializer_class = InputSerializer
 
@@ -91,10 +107,14 @@ class ModelInputAPI(APIView):
 
     def get(self, request, *args, **kwargs):
         try:
+            seq = request.query_param['seq']
             uid = request.query_param["uid"]
             text = request.query_param["text"]
             result = request.query_param["result"]
-            
+
+            if seq != None:
+                seq = QuestionInput.objects.get(seq=seq)
+                serializer = InputSerializer(seq)
             if uid != None:
                 uid = QuestionInput.objects.get(uid=uid)
                 serializer = InputSerializer(uid)
@@ -106,12 +126,13 @@ class ModelInputAPI(APIView):
                 serializer = InputSerializer(result)
         except:
             quesinputs = self.get_queryset()
-            serializer = InputSerializer(quesinputs, many=True) #get all
+            serializer = InputSerializer(quesinputs, many=True)  # get all
         return Response(serializer.data)
 
     def post(self, request, *args, **kwargs):
         input_data = request.data
-        new_input = QuestionInput.objects.create(uid=input_data["uid"], text=input_data["text"], result=input_data["result"])
+        new_input = QuestionInput.objects.create(
+            seq=genSeqID(input_data["uid"], input_data["index"]), uid=input_data["uid"], text=input_data["text"], result=input_data["result"])
         new_input.save()
         serializer = InputSerializer(new_input)
         return Response(serializer.data)

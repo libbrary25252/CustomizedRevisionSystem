@@ -90,6 +90,8 @@ class QuestionQuestion(models.Model):
 
 
 class QuestionInput(models.Model):
+    seq = models.CharField(max_length=100,
+                           default='fuckyoula-2023032115364')
     uid = models.CharField(max_length=6, default='st0001')
     text = models.TextField()
     result = models.CharField(max_length=1000, null=True, blank=True)
