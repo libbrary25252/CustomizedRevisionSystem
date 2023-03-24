@@ -1,5 +1,9 @@
 <template>
   <div class="createQList">
+    <div class="notification is-danger is-light" v-if="isEmpty()">
+      <button class="delete" @click="close" ref="closeBtn"></button>
+      Please choose the question type or topics before pushing the search button!
+    </div>
     <p class="title is-size-4-mobile mt-1">
       Search From Database
     </p>
@@ -74,6 +78,13 @@
         </div>
       </div>
     </section>
+    <section class="pt-4 mt-6">
+      <div class="result_box" v-bind:key="idx" v-for="idx in filtedList">
+        <div class="result_container container">
+          <div class="box result_box">{{ idx }}</div>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -87,6 +98,9 @@ export default {
       selectTopic: '',
       checkedTypes: [],
       TopicArr: [],
+      emptyError: false,
+      QuestionList: [],
+      filtedList: [],
       topics: [{ "text": "Algorithm Design", "value": "ALGO" }, { "text": "Basic Machine Organisation", "value": "BMO" }, { "text": "Computer System", "value": "COM" }, { "text": "Data Manipulation and Analysis", "value": "DM" }, { "text": "Data Organisation and Data Control", "value": "DO" }, { "text": "Elementary Web Authoring", "value": "ELEWEB" }, { "text": "Health and Ethical Issues", "value": "HEALTH" }, { "text": "Information Processing", "value": "INFO" }, { "text": "Intellectual Property", "value": "IP" }, { "text": "Internet Services and Applications", "value": "NETSEV" }, { "text": "Multimedia Elements", "value": "MEDIA" }, { "text": "Networking and Internet Basics", "value": "NETBAS" }, { "text": "Program Development", "value": "PROGRAM" }, { "text": "Spreadsheets and Databases", "value": "SD" }, { "text": "Threats and Security on the Internet", "value": "THREAT" }]
     }
   },
@@ -98,6 +112,12 @@ export default {
       this.TopicArr.push(e);
       // console.log(this.TopicArr);
       // console.log(this.selectTopic);
+    },
+    isEmpty() {
+      return this.emptyError;
+    },
+    close: function (event) {
+      this.emptyError = false;
     },
     getName: function (name) {
       for (var i = 0; i < this.topics.length; i++) {
@@ -114,11 +134,31 @@ export default {
       //console.log(this.TopicArr);
     },
     async search() {
-      console.log("checkedTypes: " + this.checkedTypes + " " + this.checkedTypes.length);
-      console.log("TopicArr: " + this.TopicArr + " " + this.TopicArr.length);
-      axios.get('http://127.0.0.1:8000/CRS/questions/').then(response => {
-
-      }).catch(error => console.log(error));
+      // console.log("checkedTypes: " + this.checkedTypes + " " + this.checkedTypes.length);
+      // console.log("TopicArr: " + this.TopicArr + " " + this.TopicArr.length);
+      if (this.checkedTypes.length == 0 && this.TopicArr.length == 0) {
+        this.emptyError = true;
+        // console.log("Empty error");
+      } else {
+        // const quest_form = { 'Qtype': this.checkedTypes.toString(), 'category': this.TopicArr.toString() };
+        axios.get('http://127.0.0.1:8000/CRS/questions/').then(response => {
+          console.log(response.data);
+          this.QuestionList = response.data.slice();
+          console.log(this.QuestionList);
+          this.get_QITEM();
+        }).catch(error => console.log(error));
+      }
+    },
+    get_QITEM() {
+      if (this.checkedTypes.length == 1) {
+        const type = this.checkedTypes.toString();
+        this.filtedList = this.QuestionList.filter(function (item) {
+          return item.Qtype == type;
+        });
+        console.log(this.filtedList.length);
+      } else {
+        this.filtedList = this.QuestionList;
+      }
     }
   }
 }
@@ -131,5 +171,9 @@ export default {
 
 .normal-btn {
   width: 200px;
+}
+
+.result_container {
+  padding: 6px;
 }
 </style>

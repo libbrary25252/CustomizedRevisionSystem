@@ -1,11 +1,11 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from .models import Question, QuestionQuestion, QuestionInput
-from rest_framework.views import APIView
-from rest_framework.response import Response
-import uuid
-import datetime
 from .serializers import QuestionSerializer, ContainerSerializer, InputSerializer
+import datetime
+import uuid
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from .models import Question, QuestionQuestion, QuestionInput
+from django.http import Http404
+from django.shortcuts import render
 
 
 def home(request):
@@ -30,28 +30,40 @@ class QuestionAPI(APIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            ID = request.query_param["QID"]
-            parentID = request.query_param["parentQID"]
-            statement = request.query_param["statement"]
-            string = request.query_param["string"]
-            Qtype = request.query_param["Qtype"]
-            imagefile = request.query_param["image"]
-            description = request.query_param["description"]
-            option = request.query_param["description"]
-            catergory = request.query_param["category"]
-            if ID != None:
-                ID = Question.objects.get(QID=ID)
-                serializer = QuestionSerializer(ID)
-            if string != None:
-                string = Question.objects.get(string=string)
-                serializer = QuestionSerializer(string)
-            if Qtype != None:
-                Qtype = Question.objects.get(Qtype=Qtype)
-                serializer = QuestionSerializer(Qtype)
-        except:
+            # ID = request.query_param["QID"]
+            # parentID = request.query_param["parentQID"]
+            # statement = request.query_param["statement"]
+            # string = request.query_param["string"]
+            # imagefile = request.query_param["image"]
+            # description = request.query_param["description"]
+            # option = request.query_param["option"]
+            # type = request.query_params.getlist('Qtype')
+            # topics = request.query_params.getlist('category')
+            # type = request.query_param["Qtype"]
+            # topics = request.query_param["category"]
+            # print(type, topics)
+
+            # if type is not None and topics is not None:
+            #     questions = Question.objects.filter(
+            #         Qtype__in=type, category__in=topics)
+            # elif type is not None:
+            #     questions = Question.objects.filter(Qtype__in=type)
+            # elif topics is not None:
+            #     questions = Question.objects.filter(category__in=topics)
+
+            # parentID = ''
+
+            # if parentID is not None:
+            #     parent_question = Question.objects.get(QID=parentID)
+            #     child_questions = parent_question.child_questions.all()
+            #     serializer = QuestionSerializer(child_questions, many=True)
+            #     return Response(serializer.data)
+            # else:
             questions = self.get_queryset()
-            serializer = QuestionSerializer(questions, many=True)  # get all
-        return Response(serializer.data)
+            serializer = QuestionSerializer(questions, many=True)
+            return Response(serializer.data)
+        except Question.DoesNotExist:
+            raise Http404
 
     def post(self, request, *args, **kwargs):
         question_data = request.data
