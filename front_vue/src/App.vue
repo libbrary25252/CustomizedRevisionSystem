@@ -6,7 +6,7 @@
           <router-link to="/home" class="navbar-item"><strong>Smart Campus</strong></router-link>
 
           <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar_menu"
-            @click="showMobileMenu = !showMobileMenu">
+            @click.prevent="this.showMobileMenu = !this.showMobileMenu;">
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
             <span aria-hidden="true"></span>
@@ -14,23 +14,23 @@
         </div>
 
         <div id="navbar_menu" class="navbar-menu" v-bind:class="{ 'is-active': isMobile() }">
-          <div class="navbar-start">
+          <div class=" navbar-start">
             <router-link to="/home" class="navbar-item">
               Home
             </router-link>
 
 
-            <div class="navbar-item has-dropdown is-hoverable" @click="show()">
+            <div class="navbar-item has-dropdown" v-bind:class="{ 'is-active': isActive }" @click="show()">
               <a class="navbar-link">
                 CRS
               </a>
 
               <div class="navbar-dropdown" :class="dropdownClasses">
                 <router-link to="/createQList" class="navbar-item">
-                  Question List
+                  Search Question
                 </router-link>
                 <router-link to="/genQList" class="navbar-item">
-                  Search Category
+                  Find Category
                 </router-link>
 
                 <hr class="navbar-divider">
@@ -124,15 +124,15 @@ export default {
     return {
       showMobileMenu: false,
       isActive: false,
+      isClick: false,
     }
   },
   computed: {
-
     dropdownClasses: function () {
       if (this.isActive) {
         return "is-active";
       } else {
-        return "is-hidden-touch";
+        return "is-hidden";
       }
     }
   },
@@ -141,8 +141,7 @@ export default {
       this.isActive = !this.isActive;
     },
     isMobile: function () {
-      if (this.showMobileMenu) this.isActive = false;
-      return !this.showMobileMenu;
+      return this.showMobileMenu;
     }
   }
 }
