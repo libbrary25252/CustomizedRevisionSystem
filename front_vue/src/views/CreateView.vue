@@ -57,14 +57,14 @@
           </div>
           <div class="field-body">
             <div class="field is-normal is-flex-wrap-nowrap">
-              <div class="tag pt-3" id="tagwrapper" v-bind:key="i" v-for="i in TopicArr">
-                <span class="tag is-info"> {{ getName(i) }} <button class="delete is-small"
+              <div class="tag pt-4 pb-5" id="tagwrapper" v-bind:key="i" v-for="i in TopicArr">
+                <span class="tag is-info is-size-6"> {{ getName(i) }} <button class="delete is-small"
                     @click="removeTopic(i)"></button></span>
               </div>
             </div>
           </div>
         </div>
-        <div class="is-fullwidth has-text-centered">
+        <div class="pt-4 is-fullwidth has-text-centered">
           <button class="button is-link is-rounded block normal-btn" @click="search()">
             <span class="icon">
               <i class="fa fa-search" aria-hidden="true"></i>
