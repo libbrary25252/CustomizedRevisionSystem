@@ -61,7 +61,7 @@
           </div>
           <div class="field-body">
             <div class="field is-normal is-flex-wrap-nowrap">
-              <div class="tag pt-4 pb-5" id="tagwrapper" v-bind:key="i" v-for="i in TopicArr">
+              <div class="tag pt-4 pb-5" id="tagwrapper" v-bind:key="i" v-for="i in topicArr">
                 <span class="tag is-info is-size-6"> {{ getName(i) }} <button class="delete is-small"
                     @click="removeTopic(i)"></button></span>
               </div>
@@ -184,10 +184,11 @@ export default {
     return {
       selectTopic: '',
       checkedTypes: [],
-      TopicArr: [],
+      topicArr: [],
       emptyError: false,
-      QuestionList: [],
+      questionList: [],
       filtedList: [],
+      childrenList: [],
       imgURL: '',
       noResult: false,
       descrArray: [],
@@ -201,8 +202,8 @@ export default {
   },
   methods: {
     setTopic: function (e) {
-      this.TopicArr.push(e);
-      // console.log(this.TopicArr);
+      this.topicArr.push(e);
+      // console.log(this.topicArr);
       // console.log(this.selectTopic);
     },
     isEmpty() {
@@ -219,52 +220,57 @@ export default {
       }
     },
     removeTopic(val) {
-      const idx = this.TopicArr.indexOf(val);
+      const idx = this.topicArr.indexOf(val);
       if (idx > -1) {
-        this.TopicArr.splice(idx, 1);
+        this.topicArr.splice(idx, 1);
       }
-      //console.log(this.TopicArr);
+      //console.log(this.topicArr);
     },
     async search() {
       console.log("checkedTypes: " + this.checkedTypes + " " + this.checkedTypes.length);
-      console.log("TopicArr: " + this.TopicArr + " " + this.TopicArr.length);
-      if (this.checkedTypes.length == 0 && this.TopicArr.length == 0) {
+      console.log("topicArr: " + this.topicArr + " " + this.topicArr.length);
+      if (this.checkedTypes.length == 0 && this.topicArr.length == 0) {
         this.emptyError = true;
       } else {
-        // const quest_form = { 'Qtype': this.checkedTypes.toString(), 'category': this.TopicArr.toString() };
+        // const quest_form = { 'Qtype': this.checkedTypes.toString(), 'category': this.topicArr.toString() };
         axios.get('http://127.0.0.1:8000/CRS/questions/').then(response => {
           console.log(response.data);
           let questions = response.data;
           console.log(questions);
-          let filteredQuestions = questions.map(q => {
-            if (q.parentQID !== null) {
-              let parentQuestion = questions.find(parent => parent.QID === q.parentQID);
-              if (parentQuestion) {
-                // parentQuestion.children = parentQuestion.children || {};
-                //console.log("uwu: " + JSON.stringify(q, null, 4));
-                //parentQuestion.children[q.QID] = q;
-                return null;
-              }
-            }
-            return q;
-          }).filter(q => q !== null);
-          console.log(filteredQuestions);
-          this.QuestionList = filteredQuestions.slice();
+          this.questionList = questions.slice();
           this.get_QITEM();
-          if (this.TopicArr.length >= 1) this.get_FilteredItems(this.TopicArr);
+          if (this.topicArr.length >= 1) this.get_FilteredItems(this.topicArr);
+          this.get_Children(this.filtedList);
+
         }).catch(error => console.log(error));
       }
+    },
+    get_Children: function (questions) {
+      let filteredQuestions = questions.map(q => {
+        if (q.parentQID !== null) {
+          let parentQuestion = questions.find(parent => parent.QID === q.parentQID);
+          if (parentQuestion) {
+            // parentQuestion.children = parentQuestion.children || {};
+            //console.log("uwu: " + JSON.stringify(q, null, 4));
+            //parentQuestion.children[q.QID] = q;
+            return null;
+          }
+        }
+        return q;
+      }).filter(q => q !== null);
+      this.childrenList = filteredQuestions.slice();
+      console.log(this.childrenList);
     },
     get_QITEM() {
       if (this.checkedTypes.length == 1) {
         const type = this.checkedTypes.toString();
-        this.filtedList = this.QuestionList.filter(function (item) {
+        this.filtedList = this.questionList.filter(function (item) {
           return item.Qtype == type;
         });
         console.log(this.filtedList.length);
         // console.log(this.filtedList[1].category);
       } else {
-        this.filtedList = this.QuestionList;
+        this.filtedList = this.questionList;
       }
       console.log("Final list: " + this.filtedList.length);
     },
