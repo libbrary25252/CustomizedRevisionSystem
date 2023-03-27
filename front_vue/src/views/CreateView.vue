@@ -79,9 +79,96 @@
       </div>
     </section>
     <section class="pt-4 mt-6">
-      <div class="result_box" v-bind:key="idx" v-for="idx in filtedList">
+      <p class="has-text-centered subtitle is-5" v-if="this.filtedList.length > 0"> Total: {{ this.filtedList.length }}
+        questions</p>
+      <div v-if="noResult" class="has-text-centered is-size-5 is-dark">
+        No Result Found.
+      </div>
+      <div class="result_box" v-bind:key="idx" v-for="idx, index in filtedList">
         <div class="result_container container">
-          <div class="box result_box">{{ idx }}</div>
+          <div class="box result_box">
+            <!-- tag -->
+            <div class="level">
+              <div class="level-left">
+                <div class="level-item">
+                  <span class="tag is-link is-light">{{ idx.Qtype }}</span><br>
+                </div>
+                <div class="level-item" v-bind:key="i" v-for="i in idx.category">
+                  <span class="tag is-primary is-light"> {{ getName(i) }}</span>
+                </div>
+              </div>
+            </div>
+            <!-- question string -->
+            <span v-if="idx.statement.length > 0">
+              {{ index + 1 }}.&nbsp;
+              <span v-if="idx.statement.length > 0">{{ idx.statement }}</span>
+              <p>{{ idx.string }}</p>
+            </span>
+            <span v-else>
+              {{ index + 1 }}.&nbsp;
+              {{ idx.string }}
+            </span>
+
+            <figure class="image">
+              <img class="p-1" v-bind:src="imgURL" v-if="get_img(idx.image)">
+            </figure>
+
+            <div class="JsonColumns" v-if="formatDes(idx.description)">
+              <div class="columns is-mobile" v-bind:key="d" v-for="d in descrArray">
+                <div class="column jcolumn is-narrow">
+                  <p>{{ d.name }}&nbsp;</p>
+                </div>
+                <div class="column jcolumn">
+                  <p>{{ d.data }}&nbsp;</p>
+                </div>
+              </div>
+            </div>
+            <!-- MC OPTIONS -->
+            <div class="JsonColumns" v-if="getOpt(idx.options) === 'text'">
+              <div class="columns is-mobile" v-bind:key="o" v-for="o in optionsArray">
+                <div class="column jcolumn is-narrow">
+                  <p>{{ o.name }}.&nbsp;</p>
+                </div>
+                <div class="column jcolumn">
+                  <p>{{ o.data }}&nbsp;</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="JsonColumns" v-if="getOpt(idx.options) === 'table'">
+              <div v-bind:key="o" v-for="o in optionsArray"></div>
+              <table class="table is-narrow">
+                <thead>
+                  <tr>
+                    <th class="noBorder"></th>
+                    <th class="noBorder" v-for="opt in tableArray" v-bind:key="opt">{{ opt.name }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(option, index) in optionsArray" :key="index">
+                    <td class="noBorder">{{ option.name }}</td>
+                    <td class="noBorder" v-for="(dataItem, dataIndex) in option.data" :key="dataIndex">
+                      {{ dataItem.opt }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="JsonColumns" v-if="getOpt(idx.options) === 'image'">
+              <div class="columns" v-bind:key="o" v-for="o in optionsArray">
+                <div class="column jcolumn is-narrow">
+                  <p>{{ o.name }}.&nbsp;</p>
+                </div>
+                <div class="column jcolumn">
+                  <figure class="mcImage">
+                    <img class="mcImg" v-bind:src="imgURL" v-if="get_img(o.data)">
+                  </figure>
+                </div>
+              </div>
+            </div>
+            <!-- <p v-if="idx.options.length > 0">{{ idx.options }}</p> -->
+          </div>
         </div>
       </div>
     </section>
@@ -101,6 +188,11 @@ export default {
       emptyError: false,
       QuestionList: [],
       filtedList: [],
+      imgURL: '',
+      noResult: false,
+      descrArray: [],
+      optionsArray: [],
+      tableArray: [],
       topics: [{ "text": "Algorithm Design", "value": "ALGO" }, { "text": "Basic Machine Organisation", "value": "BMO" }, { "text": "Computer System", "value": "COM" }, { "text": "Data Manipulation and Analysis", "value": "DM" }, { "text": "Data Organisation and Data Control", "value": "DO" }, { "text": "Elementary Web Authoring", "value": "ELEWEB" }, { "text": "Health and Ethical Issues", "value": "HEALTH" }, { "text": "Information Processing", "value": "INFO" }, { "text": "Intellectual Property", "value": "IP" }, { "text": "Internet Services and Applications", "value": "NETSEV" }, { "text": "Multimedia Elements", "value": "MEDIA" }, { "text": "Networking and Internet Basics", "value": "NETBAS" }, { "text": "Program Development", "value": "PROGRAM" }, { "text": "Spreadsheets and Databases", "value": "SD" }, { "text": "Threats and Security on the Internet", "value": "THREAT" }]
     }
   },
@@ -134,18 +226,32 @@ export default {
       //console.log(this.TopicArr);
     },
     async search() {
-      // console.log("checkedTypes: " + this.checkedTypes + " " + this.checkedTypes.length);
-      // console.log("TopicArr: " + this.TopicArr + " " + this.TopicArr.length);
+      console.log("checkedTypes: " + this.checkedTypes + " " + this.checkedTypes.length);
+      console.log("TopicArr: " + this.TopicArr + " " + this.TopicArr.length);
       if (this.checkedTypes.length == 0 && this.TopicArr.length == 0) {
         this.emptyError = true;
-        // console.log("Empty error");
       } else {
         // const quest_form = { 'Qtype': this.checkedTypes.toString(), 'category': this.TopicArr.toString() };
         axios.get('http://127.0.0.1:8000/CRS/questions/').then(response => {
           console.log(response.data);
-          this.QuestionList = response.data.slice();
-          console.log(this.QuestionList);
+          let questions = response.data;
+          console.log(questions);
+          let filteredQuestions = questions.map(q => {
+            if (q.parentQID !== null) {
+              let parentQuestion = questions.find(parent => parent.QID === q.parentQID);
+              if (parentQuestion) {
+                // parentQuestion.children = parentQuestion.children || {};
+                //console.log("uwu: " + JSON.stringify(q, null, 4));
+                //parentQuestion.children[q.QID] = q;
+                return null;
+              }
+            }
+            return q;
+          }).filter(q => q !== null);
+          console.log(filteredQuestions);
+          this.QuestionList = filteredQuestions.slice();
           this.get_QITEM();
+          if (this.TopicArr.length >= 1) this.get_FilteredItems(this.TopicArr);
         }).catch(error => console.log(error));
       }
     },
@@ -156,8 +262,56 @@ export default {
           return item.Qtype == type;
         });
         console.log(this.filtedList.length);
+        // console.log(this.filtedList[1].category);
       } else {
         this.filtedList = this.QuestionList;
+      }
+      console.log("Final list: " + this.filtedList.length);
+    },
+    get_FilteredItems(arr) {
+      this.filtedList = this.filtedList.filter(function (item) {
+        for (var i = 0; i < arr.length; i++) {
+          if (item.category.includes(arr[i])) {
+            return true;
+          }
+        }
+      })
+      this.filtedList == 0 ? this.noResult = true : this.noResult = false;
+      console.log("Final list: " + this.filtedList);
+    },
+    get_img(img) {
+      if (img != null) {
+        //console.log(img);
+        const img_url = "http://127.0.0.1:8000" + img;
+        this.imgURL = img_url;
+        return true;
+      }
+      return false;
+    },
+    formatDes(arr) {
+      if (arr.length > 0) {
+        const clearStr = JSON.parse(arr);
+        this.descrArray = clearStr;
+        return true;
+      }
+      return false;
+    },
+    getOpt(arr) {
+      if (arr.length > 0) {
+        const clearStr = JSON.parse(arr);
+        this.optionsArray = clearStr[0].options;
+        const type = clearStr[0].type;
+        switch (type) {
+          case 'text':
+            return 'text';
+          case 'table':
+            this.tableArray = this.optionsArray[0].data;
+            return 'table';
+          case 'image':
+            return 'image';
+          default:
+            return 'text';
+        }
       }
     }
   }
@@ -175,5 +329,57 @@ export default {
 
 .result_container {
   padding: 6px;
+}
+
+.mcImage {
+  padding: 4px
+}
+
+@media screen and (min-width: 1024px) {
+  .image img {
+    display: block;
+    height: 240px;
+    width: auto;
+  }
+
+  .mcImg {
+    display: block;
+    height: 150px;
+    width: auto;
+    padding-right: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .image img {
+    display: block;
+    width: auto;
+  }
+
+  .level-item {
+    display: inline-block;
+  }
+
+}
+
+@media screen and (min-width: 769px) and (max-width: 1023px) {
+  .image img {
+    display: block;
+    width: auto;
+  }
+
+}
+
+.jcolumn {
+
+  padding: 5px !important;
+}
+
+.JsonColumns {
+  padding: 20px;
+}
+
+.noBorder {
+  border: none !important;
 }
 </style>

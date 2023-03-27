@@ -1,15 +1,22 @@
 from .serializers import QuestionSerializer, ContainerSerializer, InputSerializer
 import datetime
-import uuid
+import os
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Question, QuestionQuestion, QuestionInput
-from django.http import Http404
+from django.conf import settings
+from django.http import Http404, JsonResponse
 from django.shortcuts import render
 
 
 def home(request):
     return render(request, 'home.html', {'name': 'Hello'})
+
+
+def get_image(request, pk):
+    my_model = Question.objects.get(QID=pk)
+    image_path = os.path.join(settings.MEDIA_URL, str(my_model.image))
+    return JsonResponse({'image_path': image_path})
 
 
 def genSeqID(uid, sequence):

@@ -51,10 +51,10 @@ class Question(models.Model):
         max_length=2, choices=TYPE_CHOICES, default=MULTIPLECHOICES)
 
     def is_upperclass(self):
-        return self.type in {self.LONG, self.MULTIPLECHOICES}
+        return self.type in {self.LONG, self.MULTIPLECHOICES}  # type: ignore
 
     image = models.ImageField(
-        upload_to="uploads/questions/", height_field=None, width_field=None, max_length=100, blank=True, null=True)  # name it by qid
+        upload_to="uploads\\images\\", height_field=None, width_field=None, max_length=100, blank=True, null=True)  # name it by qid
     description = models.TextField(null=True, blank=True)
     options = models.TextField(null=True, blank=True)
 
