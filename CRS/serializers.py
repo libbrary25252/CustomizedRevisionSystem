@@ -10,7 +10,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         if children:
             serializer = self.__class__(children, many=True)
             return serializer.data
-        return {}
+        return None
 
     class Meta:
         model = Question

@@ -84,99 +84,112 @@
       <div v-if="noResult" class="has-text-centered is-size-5 is-dark">
         No Result Found.
       </div>
-      <div class="result_box" v-bind:key="idx" v-for="idx, index in filtedList">
+
+      <div class="result_box box" v-bind:key="idx" v-for="idx in this.childrenList">
+        <recursive-component :question="idx"> </recursive-component>
+        <!-- <div>{{ index }}</div>
+        <div> {{ idx }}</div> -->
+      </div>
+      <!-- <recursive-component :question="questionData" /> -->
+      <!-- <div class="result_box" v-bind:key="idx" v-for="idx, index in filtedList">
         <div class="result_container container">
-          <div class="box result_box">
-            <!-- tag -->
-            <div class="level">
-              <div class="level-left">
-                <div class="level-item">
-                  <span class="tag is-link is-light">{{ idx.Qtype }}</span><br>
-                </div>
-                <div class="level-item" v-bind:key="i" v-for="i in idx.category">
-                  <span class="tag is-primary is-light"> {{ getName(i) }}</span>
-                </div>
-              </div>
-            </div>
-            <!-- question string -->
-            <span v-if="idx.statement.length > 0">
-              {{ index + 1 }}.&nbsp;
-              <span v-if="idx.statement.length > 0">{{ idx.statement }}</span>
-              <p>{{ idx.string }}</p>
-            </span>
-            <span v-else>
-              {{ index + 1 }}.&nbsp;
-              {{ idx.string }}
-            </span>
-
-            <figure class="image">
-              <img class="p-1" v-bind:src="imgURL" v-if="get_img(idx.image)">
-            </figure>
-
-            <div class="JsonColumns" v-if="formatDes(idx.description)">
-              <div class="columns is-mobile" v-bind:key="d" v-for="d in descrArray">
-                <div class="column jcolumn is-narrow">
-                  <p>{{ d.name }}&nbsp;</p>
-                </div>
-                <div class="column jcolumn">
-                  <p>{{ d.data }}&nbsp;</p>
+          <div class="box">
+            <div class="result_box">
+               tag 
+              <div class="level">
+                <div class="level-left">
+                  <div class="level-item">
+                    <span class="tag is-link is-light">{{ idx.Qtype }}</span><br>
+                  </div>
+                  <div class="level-item" v-bind:key="i" v-for="i in idx.category">
+                    <span class="tag is-primary is-light"> {{ getName(i) }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-            <!-- MC OPTIONS -->
-            <div class="JsonColumns" v-if="getOpt(idx.options) === 'text'">
-              <div class="columns is-mobile" v-bind:key="o" v-for="o in optionsArray">
-                <div class="column jcolumn is-narrow">
-                  <p>{{ o.name }}.&nbsp;</p>
-                </div>
-                <div class="column jcolumn">
-                  <p>{{ o.data }}&nbsp;</p>
+               question string 
+              <span v-if="idx.statement.length > 0">
+                {{ index + 1 }}.&nbsp;
+                <span v-if="idx.statement.length > 0">{{ idx.statement }}</span>
+                <p>{{ idx.string }}</p>
+              </span>
+              <span v-else>
+                {{ index + 1 }}.&nbsp;
+                {{ idx.string }}
+              </span>
+
+              <figure class="image">
+                <img class="p-1" v-bind:src="imgURL" v-if="get_img(idx.image)">
+              </figure>
+
+              <div class="JsonColumns" v-if="formatDes(idx.description)">
+                <div class="columns is-mobile" v-bind:key="d" v-for="d in descrArray">
+                  <div class="column jcolumn is-narrow">
+                    <p>{{ d.name }}&nbsp;</p>
+                  </div>
+                  <div class="column jcolumn">
+                    <p>{{ d.data }}&nbsp;</p>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div class="JsonColumns" v-if="getOpt(idx.options) === 'table'">
-              <div v-bind:key="o" v-for="o in optionsArray"></div>
-              <table class="table is-narrow">
-                <thead>
-                  <tr>
-                    <th class="noBorder"></th>
-                    <th class="noBorder" v-for="opt in tableArray" v-bind:key="opt">{{ opt.name }}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="(option, index) in optionsArray" :key="index">
-                    <td class="noBorder">{{ option.name }}</td>
-                    <td class="noBorder" v-for="(dataItem, dataIndex) in option.data" :key="dataIndex">
-                      {{ dataItem.opt }}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="JsonColumns" v-if="getOpt(idx.options) === 'image'">
-              <div class="columns" v-bind:key="o" v-for="o in optionsArray">
-                <div class="column jcolumn is-narrow">
-                  <p>{{ o.name }}.&nbsp;</p>
-                </div>
-                <div class="column jcolumn">
-                  <figure class="mcImage">
-                    <img class="mcImg" v-bind:src="imgURL" v-if="get_img(o.data)">
-                  </figure>
+              MC OPTIONS 
+              <div class="JsonColumns" v-if="getOpt(idx.options) === 'text'">
+                <div class="columns is-mobile" v-bind:key="o" v-for="o in optionsArray">
+                  <div class="column jcolumn is-narrow">
+                    <p>{{ o.name }}.&nbsp;</p>
+                  </div>
+                  <div class="column jcolumn">
+                    <p>{{ o.data }}&nbsp;</p>
+                  </div>
                 </div>
               </div>
+
+              <div class="JsonColumns" v-if="getOpt(idx.options) === 'table'">
+                <div v-bind:key="o" v-for="o in optionsArray"></div>
+                <table class="table is-narrow">
+                  <thead>
+                    <tr>
+                      <th class="noBorder"></th>
+                      <th class="noBorder" v-for="opt in tableArray" v-bind:key="opt">{{ opt.name }}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(option, index) in optionsArray" :key="index">
+                      <td class="noBorder">{{ option.name }}</td>
+                      <td class="noBorder" v-for="(dataItem, dataIndex) in option.data" :key="dataIndex">
+                        {{ dataItem.opt }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="JsonColumns" v-if="getOpt(idx.options) === 'image'">
+                <div class="columns" v-bind:key="o" v-for="o in optionsArray">
+                  <div class="column jcolumn is-narrow">
+                    <p>{{ o.name }}.&nbsp;</p>
+                  </div>
+                  <div class="column jcolumn">
+                    <figure class="mcImage">
+                      <img class="mcImg" v-bind:src="imgURL" v-if="get_img(o.data)">
+                    </figure>
+                  </div>
+                </div>
+              </div>
+               <p v-if="idx.options.length > 0">{{ idx.options }}</p>
             </div>
-            <!-- <p v-if="idx.options.length > 0">{{ idx.options }}</p> -->
           </div>
         </div>
-      </div>
+      </div> -->
     </section>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
+import RecursiveComponent from '@/components/RecursiveComponent.vue';
+
+var filted_list = [];
+var questionData = null;
 
 export default {
   name: 'GenView',
@@ -188,7 +201,7 @@ export default {
       emptyError: false,
       questionList: [],
       filtedList: [],
-      childrenList: [],
+      childrenList: {},
       imgURL: '',
       noResult: false,
       descrArray: [],
@@ -198,7 +211,7 @@ export default {
     }
   },
   components: {
-
+    RecursiveComponent
   },
   methods: {
     setTopic: function (e) {
@@ -234,56 +247,68 @@ export default {
       } else {
         // const quest_form = { 'Qtype': this.checkedTypes.toString(), 'category': this.topicArr.toString() };
         axios.get('http://127.0.0.1:8000/CRS/questions/').then(response => {
-          console.log(response.data);
-          let questions = response.data;
-          console.log(questions);
-          this.questionList = questions.slice();
-          this.get_QITEM();
-          if (this.topicArr.length >= 1) this.get_FilteredItems(this.topicArr);
-          this.get_Children(this.filtedList);
-
+          const responseArray = response.data;
+          console.log(responseArray);
+          let final_list = [];
+          final_list = this.get_QITEM(responseArray);
+          if (this.topicArr.length >= 1) {
+            final_list = this.get_FilteredItems(this.topicArr);
+          }
+          this.get_Children(final_list);
         }).catch(error => console.log(error));
       }
     },
     get_Children: function (questions) {
+      console.log(questions);
       let filteredQuestions = questions.map(q => {
         if (q.parentQID !== null) {
           let parentQuestion = questions.find(parent => parent.QID === q.parentQID);
           if (parentQuestion) {
-            // parentQuestion.children = parentQuestion.children || {};
-            //console.log("uwu: " + JSON.stringify(q, null, 4));
-            //parentQuestion.children[q.QID] = q;
             return null;
           }
         }
         return q;
       }).filter(q => q !== null);
-      this.childrenList = filteredQuestions.slice();
+
+      questionData = filteredQuestions;
+      console.log(filteredQuestions);
+      console.log("PRINT");
+      // this.questionData = this.childrenList;
+      console.log(questionData);
+      console.log(typeof (questionData[0].children))
+      this.childrenList = questionData;
+      console.log('childrenList:')
       console.log(this.childrenList);
     },
-    get_QITEM() {
+    get_QITEM(dataArr) {
       if (this.checkedTypes.length == 1) {
         const type = this.checkedTypes.toString();
-        this.filtedList = this.questionList.filter(function (item) {
+        filted_list = dataArr.filter(function (item) {
           return item.Qtype == type;
         });
-        console.log(this.filtedList.length);
-        // console.log(this.filtedList[1].category);
+        this.filtedList = filted_list;
       } else {
-        this.filtedList = this.questionList;
+        this.filtedList = dataArr;
+        filted_list = dataArr;
       }
       console.log("Final list: " + this.filtedList.length);
+      console.log("Final list: " + filted_list.length);
+      return filted_list;
     },
     get_FilteredItems(arr) {
-      this.filtedList = this.filtedList.filter(function (item) {
+      const filter_list = filted_list.filter(function (item) {
         for (var i = 0; i < arr.length; i++) {
           if (item.category.includes(arr[i])) {
             return true;
           }
         }
       })
+      console.log(filter_list.length);
+      this.filtedList = filter_list;
       this.filtedList == 0 ? this.noResult = true : this.noResult = false;
-      console.log("Final list: " + this.filtedList);
+      console.log("cater!");
+      console.log(this.filtedList);
+      return filter_list;
     },
     get_img(img) {
       if (img != null) {
