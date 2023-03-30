@@ -40,9 +40,9 @@
               </div>
             </div>
 
-            <router-link to="/activity" class="navbar-item">
+            <!-- <router-link to="/activity" class="navbar-item">
               Activity
-            </router-link>
+            </router-link> -->
           </div>
 
           <div class="navbar-end">
@@ -59,6 +59,8 @@
           </div>
         </div>
       </nav>
+
+
       <!-- <div>
 <nav class="navbar is-dark">
   <div class="navbar-brand">

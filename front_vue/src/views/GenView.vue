@@ -10,10 +10,13 @@
     <p class=" is-size-5-mobile subtitle">
       Input the questions that you want to know their corresponding <strong>topics</strong>.
     </p>
-    <button class="button is-primary is-rounded mb-3" @click="addQuestion">
-      Add Question
-    </button>
     <div class="container is-max-desktop" id="QContainer">
+      <div class="buttons  is-right">
+        <button class="button is-primary is-rounded" @click="addQuestion">
+          Add Question
+        </button>
+        <button class="button is-rounded is-danger">Export</button>
+      </div>
       <div class="notification" id="Qcontainer_body">
         <form class="field" @submit.prevent="submitForm">
           <div class="box">

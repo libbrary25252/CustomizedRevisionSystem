@@ -10,7 +10,11 @@
     <p class=" is-size-5-mobile subtitle">
       Search the questions from the database by selected categories.
     </p>
+
     <section class="container is-fullhd">
+      <div class="buttons is-right">
+        <button class="button is-rounded is-danger">Export</button>
+      </div>
       <div class="box search_bar">
         <!-- <div class="field is-grouped">
           <p class="control is-expanded">
@@ -79,17 +83,23 @@
       </div>
     </section>
     <section class="pt-4 mt-6">
-      <p class="has-text-centered subtitle is-5" v-if="this.filtedList.length > 0"> Total: {{ this.filtedList.length }}
-        questions</p>
+      <div v-if="this.filtedList.length > 0">
+        <p class="has-text-centered subtitle is-5"> Total: {{ this.filtedList.length }}
+          questions</p>
+        <div class="container">
+          <div class="result_box box" v-bind:key="idx" v-for="idx in this.childrenList">
+            <recursive-component :question="idx"> </recursive-component>
+            <!-- <div>{{ index }}</div>
+        <div> {{ idx }}</div> -->
+          </div>
+        </div>
+
+      </div>
       <div v-if="noResult" class="has-text-centered is-size-5 is-dark">
         No Result Found.
       </div>
 
-      <div class="result_box box" v-bind:key="idx" v-for="idx in this.childrenList">
-        <recursive-component :question="idx"> </recursive-component>
-        <!-- <div>{{ index }}</div>
-        <div> {{ idx }}</div> -->
-      </div>
+
       <!-- <recursive-component :question="questionData" /> -->
       <!-- <div class="result_box" v-bind:key="idx" v-for="idx, index in filtedList">
         <div class="result_container container">
@@ -240,6 +250,7 @@ export default {
       //console.log(this.topicArr);
     },
     async search() {
+      let final_list = [];
       console.log("checkedTypes: " + this.checkedTypes + " " + this.checkedTypes.length);
       console.log("topicArr: " + this.topicArr + " " + this.topicArr.length);
       if (this.checkedTypes.length == 0 && this.topicArr.length == 0) {
@@ -249,17 +260,16 @@ export default {
         axios.get('http://127.0.0.1:8000/CRS/questions/').then(response => {
           const responseArray = response.data;
           console.log(responseArray);
-          let final_list = [];
           final_list = this.get_QITEM(responseArray);
           if (this.topicArr.length >= 1) {
             final_list = this.get_FilteredItems(this.topicArr);
           }
-          this.get_Children(final_list);
+          if (final_list.length > 0) this.get_Children(final_list);
         }).catch(error => console.log(error));
       }
     },
     get_Children: function (questions) {
-      console.log(questions);
+      console.log("waht is:" + questions);
       let filteredQuestions = questions.map(q => {
         if (q.parentQID !== null) {
           let parentQuestion = questions.find(parent => parent.QID === q.parentQID);
