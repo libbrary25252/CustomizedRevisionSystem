@@ -28,3 +28,4 @@ class InputSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionInput
         fields = ['seq', 'uid', 'text', 'result']
+

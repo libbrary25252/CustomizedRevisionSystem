@@ -1,5 +1,5 @@
 <template>
-  <div class="createQList">
+  <div class="createQList section">
     <div class="notification is-danger is-light" v-if="isEmpty()">
       <button class="delete" @click="close" ref="closeBtn"></button>
       Please choose the question type or topics before pushing the search button!

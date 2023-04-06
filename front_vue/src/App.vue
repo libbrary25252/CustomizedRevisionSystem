@@ -20,7 +20,7 @@
             </router-link>
 
 
-            <div class="navbar-item has-dropdown" v-bind:class="{ 'is-active': isActive }" @click="show()">
+            <div class="navbar-item has-dropdown" v-if="isLogin()" v-bind:class="{ 'is-active': isActive }" @click="show()">
               <a class="navbar-link">
                 CRS
               </a>
@@ -40,20 +40,23 @@
               </div>
             </div>
 
-            <!-- <router-link to="/activity" class="navbar-item">
-              Activity
-            </router-link> -->
+            <router-link to="/activity" class="navbar-item" v-if="isLogin()">
+              My History
+            </router-link>
           </div>
 
           <div class="navbar-end">
             <div class="navbar-item">
               <div class="buttons">
-                <router-link to="/profile" class="button is-info">
+                <router-link to="/profile" class="button is-info" v-if="isLogin()">
                   <strong>Profile</strong>
                 </router-link>
-                <router-link to="/login" class="button is-light">
+                <router-link to="/login" class="button is-light" v-if="isLogin()==false">
                   Log in
                 </router-link>
+                <button class="button is-light" v-if="isLogin()" @click="logout">
+                  Log out
+                </button>
               </div>
             </div>
           </div>
@@ -92,9 +95,9 @@
   </div>
 </nav> -->
 
-      <section class="section">
+
         <router-view />
-      </section>
+      
       <footer class="footer">
         <p class="has-text-centered">Copyright (c) 2022</p>
       </footer>
@@ -121,12 +124,25 @@ footer {
 </style>
 
 <script>
+import { throwStatement } from '@babel/types';
+import axios from 'axios';
+
 export default {
   data() {
     return {
       showMobileMenu: false,
       isActive: false,
       isClick: false,
+      needLogin: true
+    }
+  },
+  beforeCreate() {
+    this.$store.commit('initalizeStore');
+    const token = this.$store.state.token;
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = "Token " + token;
+    }else {
+      axios.defaults.headers.common['Authorization'] = "";
     }
   },
   computed: {
@@ -144,7 +160,34 @@ export default {
     },
     isMobile: function () {
       return this.showMobileMenu;
-    }
+    },
+    isLogin(){
+      if(localStorage.getItem('token')) {
+        return true;
+      }else return false;
+    },
+    logout() {
+      axios.post('/api/v1/token/logout/')
+    .then(response => {
+       const token = response.data.auth_token
+          this.$store.commit('removeToken', token)
+          axios.defaults.headers.common["Authorization"] = ""
+          localStorage.removeItem('token');
+          console.log("logout")
+          window.location.href = '/login' // Redirect to login page
+    })
+    .catch(error => {
+      // Handle the error
+      if (error.response) {
+            for (const property in error.response.data) {
+              this.errors.push(`${property}: ${error.response.data[property]}`)
+            }
+          } else {
+            this.errors.push('Something went wrong. Please try again')
+            console.log(JSON.stringify(error))
+          }
+    }); 
+    },
   }
 }
 </script>

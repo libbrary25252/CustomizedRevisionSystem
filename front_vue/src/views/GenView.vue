@@ -1,5 +1,5 @@
 <template>
-  <div class="genQ">
+  <div class="genQ section">
     <div class="notification is-primary is-light" v-if="isSuccess()">
       <button class="delete" @click="close" ref="closeBtn"></button>
       Successfully generated the results!
@@ -18,7 +18,7 @@
         <button class="button is-rounded is-danger">Export</button>
       </div>
       <div class="notification" id="Qcontainer_body">
-        <form class="field" @submit.prevent="submitForm">
+        <form class="field" @submit.prevent="submitQuestion">
           <div class="box">
             <div class="Qcontainer_item block" v-bind:key="q" v-for="q, index in questionList">
               <br>

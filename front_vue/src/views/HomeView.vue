@@ -1,17 +1,20 @@
 <template>
-  <div class="home">
-    <section class="hero is-medium is-info">
-      <div class="hero-body">
-        <div class="container has-text-centered ">
-          <p class="title is-size-2">
-            Welcome to Smart Campus
-          </p>
-          <p class="subtitle is-size-4">
-            Let's explore your customized study tour!
-          </p>
-        </div>
+  <section class="hero is-medium is-info">
+    <div class="hero-body">
+      <div class="container has-text-centered ">
+        <p class="title is-size-2">
+          Welcome to Smart Campus
+        </p>
+        <p class="subtitle is-size-4">
+          Let's explore your customized study tour!
+        </p>
       </div>
-    </section>
+      <div class="container has-text-centered pt-6" v-if="isLogin()==false">
+        <button class="button is-info is-light is-size-5" @click="gotoLogin">Sign in / Login</button>
+      </div>
+    </div>
+  </section>
+  <div class="home">
     <section class="section">
       <div class="container">
         <div class="has-text-centered pb-4" id="services-text-container">
@@ -56,9 +59,10 @@
                 <!-- <div class="has-text-centered">
                     <img src="images/card-item-1.png" />
                   </div> -->
-                <h3 class="title is-3 has-text-centered" id="card-product-description">Activity</h3>
+                <h3 class="title is-3 has-text-centered" id="card-product-description">View History</h3>
                 <p class="has-text-centered">
-                  You can find your recommendations about your extracurricular activities here.
+                  This function requires you to <strong>sign in first</strong>. <br>You can find your history of
+                  customized paper set here.
                 </p>
               </div>
             </div>
@@ -75,8 +79,22 @@
 <script>
 export default {
   name: 'HomeView',
+  data() {
+    return {
+    }
+  },
   components: {
 
+  },
+  methods: {
+    gotoLogin() {
+        this.$router.push('/login');
+    },
+    isLogin(){
+      if(localStorage.getItem('token')) {
+        return true;
+      }else return false;
+    }
   }
 }
 </script>

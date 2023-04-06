@@ -6,5 +6,5 @@ import axios from 'axios'
 // import Vue from 'vue'
 // import VueSidebarMenu from 'vue-sidebar-menu'
 // import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
-axios.defaults.baseURL = "http://localhost:8080/home"
+axios.defaults.baseURL = "http://127.0.0.1:8000"
 createApp(App).use(store).use(router, axios).mount('#app')

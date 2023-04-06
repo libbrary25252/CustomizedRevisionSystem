@@ -1,22 +1,27 @@
 import uuid
 from django.db import models
+from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
 from multiselectfield import MultiSelectField
 
 # Create models
-
-
 class User(models.Model):
-    user_id = models.CharField(max_length=6, default='st0001')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    role_id = models.ForeignKey(
+        "Role", on_delete=models.CASCADE)
+    info_id = models.ForeignKey(
+        "UserInfo", on_delete=models.CASCADE, null=True)
+    is_active = models.BooleanField(default=True)
+    
+
+class UserInfo(models.Model):
+    info_id = models.CharField(max_length=6, default='')
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
-    password = models.CharField(max_length=50)
+    # password = models.CharField(max_length=50)
     phone_no = PhoneNumberField(blank=True)
     create_date = models.DateField()
-    role_id = models.ForeignKey(
-        "Role", on_delete=models.CASCADE)
-
     def __str__(self):
         return self.first_name + ' ' + self.last_name
 
@@ -92,7 +97,7 @@ class QuestionQuestion(models.Model):
 class QuestionInput(models.Model):
     seq = models.CharField(max_length=100,
                            default='fuckyoula-2023032115364')
-    uid = models.CharField(max_length=6, default='st0001')
+    uid = models.CharField(max_length=6,default="st0001")
     text = models.TextField()
     result = models.CharField(max_length=1000, null=True, blank=True)
 
