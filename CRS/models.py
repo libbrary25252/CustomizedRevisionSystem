@@ -3,8 +3,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from phonenumber_field.modelfields import PhoneNumberField
 from multiselectfield import MultiSelectField
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
 
-# Create models
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+
+
 class User(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     role_id = models.ForeignKey(
@@ -12,7 +22,7 @@ class User(models.Model):
     info_id = models.ForeignKey(
         "UserInfo", on_delete=models.CASCADE, null=True)
     is_active = models.BooleanField(default=True)
-    
+
 
 class UserInfo(models.Model):
     info_id = models.CharField(max_length=6, default='')
@@ -22,6 +32,7 @@ class UserInfo(models.Model):
     # password = models.CharField(max_length=50)
     phone_no = PhoneNumberField(blank=True)
     create_date = models.DateField()
+
     def __str__(self):
         return self.first_name + ' ' + self.last_name
 
@@ -97,7 +108,7 @@ class QuestionQuestion(models.Model):
 class QuestionInput(models.Model):
     seq = models.CharField(max_length=100,
                            default='fuckyoula-2023032115364')
-    uid = models.CharField(max_length=6,default="st0001")
+    uid = models.CharField(max_length=6, default="st0001")
     text = models.TextField()
     result = models.CharField(max_length=1000, null=True, blank=True)
 

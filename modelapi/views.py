@@ -1,11 +1,9 @@
-# Import necessary libraries
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.shortcuts import render
-from CRS.views import ModelInputAPI
 import numpy as np
+from rest_framework import permissions
 
 model_path = "./ml_model/distlBert-model-v8"
 
@@ -29,6 +27,11 @@ label2id = {label: idx for idx, label in enumerate(model_labels)}
 
 
 class ModelAPI(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def get(self):
+        pass
+
     def post(self, request):
         # load the model
         model = AutoModelForSequenceClassification.from_pretrained(

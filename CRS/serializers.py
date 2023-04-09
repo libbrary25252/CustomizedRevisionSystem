@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Question, QuestionQuestion, QuestionInput
+from .models import User, Question, QuestionQuestion, QuestionInput, UserInfo
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -29,3 +29,16 @@ class InputSerializer(serializers.ModelSerializer):
         model = QuestionInput
         fields = ['seq', 'uid', 'text', 'result']
 
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserInfo
+        fields = '__all__'
+
+
+class UserSerializer(serializers.ModelSerializer):
+    info_id = UserInfoSerializer()
+
+    class Meta:
+        model = User
+        fields = '__all__'

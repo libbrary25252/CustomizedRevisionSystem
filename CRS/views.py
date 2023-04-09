@@ -1,12 +1,31 @@
-from .serializers import QuestionSerializer, ContainerSerializer, InputSerializer
+from .serializers import QuestionSerializer, ContainerSerializer, InputSerializer, UserSerializer, UserInfoSerializer
 import datetime
 import os
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Question, QuestionQuestion, QuestionInput
+from .models import Question, QuestionQuestion, QuestionInput, User, UserInfo
 from django.conf import settings
 from django.http import Http404, JsonResponse
+from rest_framework import permissions, authentication
 from django.shortcuts import render
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+
+
+class CustomAuthToken(ObtainAuthToken):
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data,
+                                           context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
 
 
 def home(request):
@@ -26,6 +45,28 @@ def genSeqID(uid, sequence):
     res = uid + "-" + str_time + "-" + str(sequence)
     print(res)
     return res
+
+
+class UserAPI(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        user = User.objects.all()
+        return user
+
+    def get(self, request, *args, **kwargs):
+        try:
+            token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
+            users = self.get_queryset()
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            raise Http404
+
+    def post():
+        pass
 
 
 class QuestionAPI(APIView):

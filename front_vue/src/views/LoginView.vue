@@ -30,7 +30,6 @@
             </div>
           </div>
         </div>
-        <p>No account? <router-link to="/signup">click here</router-link> to sign up!</p>
       </form>
     </div>
   </div>
@@ -96,7 +95,9 @@ export default {
   }
 }
 
-@media screen and (max-width:641px) { /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */ 
+@media screen and (max-width:641px) {
+
+  /* portrait tablets, portrait iPad, landscape e-readers, landscape 800x480 or 854x480 phones */
   .login {
     max-width: none !important;
     padding-left: 32px;
@@ -106,7 +107,7 @@ export default {
 }
 
 
-.loginBtn{
+.loginBtn {
   width: 100%;
 }
 

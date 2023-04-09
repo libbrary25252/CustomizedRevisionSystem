@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'CRS',
     'api',
+    'modelapi',
     "phonenumber_field",
     'debug_toolbar',
     'rest_framework',
@@ -152,7 +153,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
-print(MEDIA_ROOT)
 
 # rest api
 REST_FRAMEWORK = {
@@ -161,9 +161,12 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
         'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAdminUser',
         'rest_framework.permissions.IsAuthenticated'
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication'
     ]
 }

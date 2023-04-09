@@ -92,18 +92,14 @@ export default {
       for (let i = 0; i < this.questionList.length; i++) {
         const question = this.questionList[i];
 
-        await axios.post('http://127.0.0.1:8000/api/model/', { 'text': question.text })
+        await axios.post('/modelapi/api', { 'text': question.text })
           .then(response => {
             const topics = response.data["prediction"].join(", ");
             question.result = topics || "No result";
             console.log(question.result)
             this.SuccessResponse = true;
-          })
-          .catch(error => {
-            console.log(error);
-            question.result = "Error";
           }).then(response => {
-            axios.post('http://127.0.0.1:8000/CRS/inputs', {
+            axios.post('/CRS/inputs/', {
               'index': i + 1,
               'uid': this.uid,
               'text': question.text,
@@ -115,6 +111,10 @@ export default {
               .catch(error => {
                 console.log(error);
               });
+          })
+          .catch(error => {
+            console.log(error);
+            question.result = "Error";
           });
       }
     }
