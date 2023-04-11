@@ -28,9 +28,9 @@ const routes = [
     component: () => import('../views/ReportView.vue')
   },
   {
-    path: '/activity',
-    name: 'Activity',
-    component: () => import('../views/ActivityView.vue')
+    path: '/database',
+    name: 'Database',
+    component: () => import('../views/DatabaseView.vue')
   },
   {
     path: '/profile',

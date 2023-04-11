@@ -20,7 +20,8 @@
             </router-link>
 
 
-            <div class="navbar-item has-dropdown" v-if="isLogin()" v-bind:class="{ 'is-active': isActive }" @click="show()">
+            <div class="navbar-item has-dropdown" v-if="isLogin()" v-bind:class="{ 'is-active': isActive }"
+              @click="show()">
               <a class="navbar-link">
                 CRS
               </a>
@@ -32,16 +33,10 @@
                 <router-link to="/genQList" class="navbar-item">
                   Find Category
                 </router-link>
-
-                <hr class="navbar-divider">
-                <router-link to="/report" class="navbar-item">
-                  Report an issue
-                </router-link>
               </div>
             </div>
-
-            <router-link to="/activity" class="navbar-item" v-if="isLogin()">
-              My History
+            <router-link to="/database" v-if="isLogin()" class="navbar-item">
+              Database
             </router-link>
           </div>
 
@@ -51,7 +46,7 @@
                 <router-link to="/profile" class="button is-info" v-if="isLogin()">
                   <strong>Profile</strong>
                 </router-link>
-                <router-link to="/login" class="button is-light" v-if="isLogin()==false">
+                <router-link to="/login" class="button is-light" v-if="isLogin() == false">
                   Log in
                 </router-link>
                 <button class="button is-light" v-if="isLogin()" @click="logout">
@@ -96,8 +91,8 @@
 </nav> -->
 
 
-        <router-view />
-      
+      <router-view />
+
       <footer class="footer">
         <p class="has-text-centered">Copyright (c) 2022</p>
       </footer>
@@ -133,7 +128,8 @@ export default {
       showMobileMenu: false,
       isActive: false,
       isClick: false,
-      needLogin: true
+      needLogin: true,
+      role: ''
     }
   },
   beforeCreate() {
@@ -141,7 +137,7 @@ export default {
     const token = this.$store.state.token;
     if (token) {
       axios.defaults.headers.common['Authorization'] = "Token " + token;
-    }else {
+    } else {
       axios.defaults.headers.common['Authorization'] = "";
     }
   },
@@ -154,6 +150,9 @@ export default {
       }
     }
   },
+  mounted() {
+    document.title = 'Smart Campus'
+  },
   methods: {
     show: function () {
       this.isActive = !this.isActive;
@@ -161,24 +160,26 @@ export default {
     isMobile: function () {
       return this.showMobileMenu;
     },
-    isLogin(){
-      if(localStorage.getItem('token')) {
+    isLogin() {
+      if (localStorage.getItem('token')) {
         return true;
-      }else return false;
+      } else return false;
     },
     logout() {
       axios.post('/api/v1/token/logout/')
-    .then(response => {
-       const token = response.data.auth_token
+        .then(response => {
+          const token = response.data.auth_token
           this.$store.commit('removeToken', token)
           axios.defaults.headers.common["Authorization"] = ""
           localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          localStorage.removeItem('info_id');
           console.log("logout")
           window.location.href = '/login' // Redirect to login page
-    })
-    .catch(error => {
-      // Handle the error
-      if (error.response) {
+        })
+        .catch(error => {
+          // Handle the error
+          if (error.response) {
             for (const property in error.response.data) {
               this.errors.push(`${property}: ${error.response.data[property]}`)
             }
@@ -186,7 +187,7 @@ export default {
             this.errors.push('Something went wrong. Please try again')
             console.log(JSON.stringify(error))
           }
-    }); 
+        });
     },
   }
 }

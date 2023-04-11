@@ -14,7 +14,6 @@ from rest_framework.response import Response
 
 
 class CustomAuthToken(ObtainAuthToken):
-
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data,
                                            context={'request': request})
@@ -49,27 +48,33 @@ def genSeqID(uid, sequence):
 
 class UserAPI(APIView):
     authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
     serializer_class = UserSerializer
 
     def get_queryset(self):
         user = User.objects.all()
         return user
 
-    def get(self, request, *args, **kwargs):
-        try:
-            token = request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
-            users = self.get_queryset()
-            serializer = UserSerializer(users, many=True)
-            return Response(serializer.data)
-        except User.DoesNotExist:
-            raise Http404
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        token = data['token']
+        print('\nposted data: ' + token)
+        token_obj = Token.objects.get(key=token)
+        # Access the user object from the token object
+        user = token_obj.user
+        users = User.objects.get(user=user)
+        serializer = UserSerializer(users, many=False)
+        # try:
 
-    def post():
-        pass
+        # except:
+        #     users = self.get_queryset()
+        #     serializer = UserSerializer(users, many=True)  # get all
+        return Response(serializer.data)
 
 
 class QuestionAPI(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.AllowAny]
     serializer_class = QuestionSerializer
 
     def get_queryset(self):
@@ -116,13 +121,15 @@ class QuestionAPI(APIView):
     def post(self, request, *args, **kwargs):
         question_data = request.data
         new_question = Question.objects.create(QID=question_data["QID"], statement=question_data["statement"], string=question_data["string"],
-                                               Qtype=question_data["Qtype"], description=question_data["description"], options=question_data["options"])
+                                               Qtype=question_data["Qtype"], description=question_data["description"], options=question_data["options"], image=question_data["image"], category=question_data["category"])
         new_question.save()
         serializer = QuestionSerializer(new_question)
         return Response(serializer.data)
 
 
 class ContainerAPI(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.AllowAny]
     serializer_class = ContainerSerializer
 
     def get_queryset(self):
@@ -159,6 +166,8 @@ class ContainerAPI(APIView):
 
 
 class ModelInputAPI(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.AllowAny]
     serializer_class = InputSerializer
 
     def get_queryset(self):

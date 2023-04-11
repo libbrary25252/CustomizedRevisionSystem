@@ -60,10 +60,10 @@
                   <!-- <div class="has-text-centered">
                     <img src="images/card-item-1.png" />
                   </div> -->
-                  <h3 class="title is-3 has-text-centered" id="card-product-description">View History</h3>
+                  <h3 class="title is-3 has-text-centered" id="card-product-description">Add Question</h3>
                   <p class="has-text-centered">
-                    This function requires you to <strong>sign in first</strong>. <br>You can find your history of
-                    customized paper set here.
+                    This function requires you to <strong>sign in first</strong>. <br>You can add questions to the
+                    database.
                   </p>
                 </div>
               </div>
@@ -78,6 +78,8 @@
   </div>
 </template>
 <script>
+import axios from 'axios';
+
 export default {
   name: 'HomeView',
   data() {
@@ -87,6 +89,9 @@ export default {
   components: {
 
   },
+  mounted() {
+    this.fetchedData()
+  },
   methods: {
     gotoLogin() {
       this.$router.push('/login');
@@ -95,7 +100,20 @@ export default {
       if (localStorage.getItem('token')) {
         return true;
       } else return false;
-    }
+    },
+    async fetchedData() {
+      const token = localStorage.getItem('token');
+      console.log(token)
+
+      await axios.post(`/CRS/users/`, { 'token': token }).then(response => {
+        console.log(response.data)
+        const data = response.data;
+        const role = data.role_id
+        localStorage.setItem('role', role)
+        const info = data.info_id;
+        localStorage.setItem('info_id', info.info_id)
+      }).catch(error => console.log(error));
+    },
   }
 }
 </script>

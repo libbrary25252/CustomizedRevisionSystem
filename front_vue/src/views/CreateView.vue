@@ -12,9 +12,6 @@
     </p>
 
     <section class="container is-fullhd">
-      <div class="buttons is-right">
-        <button class="button is-rounded is-danger">Export</button>
-      </div>
       <div class="box search_bar">
         <!-- <div class="field is-grouped">
           <p class="control is-expanded">
@@ -250,6 +247,7 @@ export default {
       //console.log(this.topicArr);
     },
     async search() {
+      this.noResult = false;
       let final_list = [];
       console.log("checkedTypes: " + this.checkedTypes + " " + this.checkedTypes.length);
       console.log("topicArr: " + this.topicArr + " " + this.topicArr.length);

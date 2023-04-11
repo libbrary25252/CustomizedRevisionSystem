@@ -23,8 +23,8 @@
 
         <div class="field">
           <div class="control">
-            <p class="is-size-7 pb-4">Forget Your <router-link
-                to="/signup"><strong>Username/Password</strong>?</router-link></p>
+            <!-- <p class="is-size-7 pb-4">Forget Your <router-link
+                to="/signup"><strong>Username/Password</strong>?</router-link></p> -->
             <div class="is-fullwidth has-text-centered pt-3">
               <button class="button is-primary loginBtn">Login</button>
             </div>
@@ -60,17 +60,21 @@ export default {
         password: this.password
       }
       console.log(formData);
+
       await axios
         .post("/api/v1/token/login/", formData)
         .then(response => {
+          // const user_id = response.data.user_id;
+          console.log(response.data);
           const token = response.data.auth_token
+          console.log(token)
           this.$store.commit('setToken', token)
           axios.defaults.headers.common["Authorization"] = "Token " + token
           localStorage.setItem("token", token)
           console.log("success?")
           window.location.href = '/home'
-        })
-        .catch(error => {
+          // this.$router.push('/home')
+        }).catch(error => {
           if (error.response) {
             for (const property in error.response.data) {
               this.errors.push(`${property}: ${error.response.data[property]}`)
@@ -79,8 +83,28 @@ export default {
             this.errors.push('Something went wrong. Please try again')
             console.log(JSON.stringify(error))
           }
-        })
+        });
     }
+    // await axios
+    //   .get("/CRS/api/token/auth/", { 'username': this.username, 'password': this.password })
+    //   .then(response => {
+    //     console.log("hiii")
+    //     const token = response.data.auth_token
+    //     console.log(response.data)
+    //     this.$store.commit('setToken', token)
+    //     axios.defaults.headers.common["Authorization"] = "Token " + token
+    //     localStorage.setItem("token", token)
+    //     console.log("success?")
+    //     // this.$store.commit('setToken', token)
+    //     // axios.defaults.headers.common["Authorization"] = "Token " + token
+    //     // localStorage.setItem("token", token)
+    //     // console.log("success?")
+    //     // window.location.href = '/home'
+
+    //   })
+    //   .catch(error => {
+    //     console.log(JSON.stringify(error));
+    //   })
   }
 }
 </script>
