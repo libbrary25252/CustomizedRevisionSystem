@@ -217,7 +217,7 @@ export default {
         // formData.append('image', this.imgfile, this.imageName); // add the image file to the FormData object
         // console.log(formData)
         const formData = {
-          QID: '3123',
+          QID: this.qid,
           statement: '',
           string: 'What are the advantages of using the following calendar box over a text box for entering a date?',
           Qtype: "MC",

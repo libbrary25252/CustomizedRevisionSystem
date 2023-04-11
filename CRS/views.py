@@ -73,7 +73,6 @@ class UserAPI(APIView):
 
 
 class QuestionAPI(APIView):
-    authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.AllowAny]
     serializer_class = QuestionSerializer
 
@@ -128,7 +127,6 @@ class QuestionAPI(APIView):
 
 
 class ContainerAPI(APIView):
-    authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.AllowAny]
     serializer_class = ContainerSerializer
 
@@ -166,7 +164,6 @@ class ContainerAPI(APIView):
 
 
 class ModelInputAPI(APIView):
-    authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [permissions.AllowAny]
     serializer_class = InputSerializer
 
