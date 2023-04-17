@@ -32,9 +32,13 @@
                 <input type="radio" v-model="qtype" name="question" value="MC">
                 Multiple Choice Question
               </label>
-              <p class="help is-danger" v-if="Notvalid()">This field cannot be empty</p>
             </div>
           </div>
+          <article class="message is-small is-danger" v-if="!validMC">
+            <div class="message-body">
+              This field cannot be empty.
+            </div>
+          </article>
 
           <div class="field">
             <label class="label">Statement</label>
@@ -49,6 +53,16 @@
               <textarea class="input" type="text" placeholder="Text input" v-model="qstr"></textarea>
             </div>
           </div>
+          <article class="message is-small is-danger" v-if="!validStr">
+            <div class="message-body">
+              This field cannot be empty.
+            </div>
+          </article>
+          <article class="message is-small is-danger" v-if="!validLen">
+            <div class="message-body">
+              Inputted string is too short, it requires at least 10 characters.
+            </div>
+          </article>
 
           <div class="field">
             <label class="label" for="image">Image</label>
@@ -88,6 +102,11 @@
                 </div>
               </div>
             </div>
+            <article class="message is-small is-danger" v-if="!validOpt">
+              <div class="message-body">
+                All Options fields must be filled.
+              </div>
+            </article>
           </div>
           <div class="field is-grouped">
             <div class="control">
@@ -110,6 +129,10 @@ export default {
   name: 'DatabaseView',
   data() {
     return {
+      validMC: true,
+      validOpt: true,
+      validStr: true,
+      validLen: true,
       topics: [{ "text": "Algorithm Design", "value": "ALGO" }, { "text": "Basic Machine Organisation", "value": "BMO" }, { "text": "Computer System", "value": "COM" }, { "text": "Data Manipulation and Analysis", "value": "DM" }, { "text": "Data Organisation and Data Control", "value": "DO" }, { "text": "Elementary Web Authoring", "value": "ELEWEB" }, { "text": "Health and Ethical Issues", "value": "HEALTH" }, { "text": "Information Processing", "value": "INFO" }, { "text": "Intellectual Property", "value": "IP" }, { "text": "Internet Services and Applications", "value": "NETSEV" }, { "text": "Multimedia Elements", "value": "MEDIA" }, { "text": "Networking and Internet Basics", "value": "NETBAS" }, { "text": "Program Development", "value": "PROGRAM" }, { "text": "Spreadsheets and Databases", "value": "SD" }, { "text": "Threats and Security on the Internet", "value": "THREAT" }],
       qtype: '',
       success: false,
@@ -214,14 +237,18 @@ export default {
       //let topic = this.getresult();
       // const Topicarr = this.topicArr.toString();
       // console.log(Topicarr)
+      const Qstring = this.qstate.trim().length > 0? this.qstate.trim() + " " + this.qstr.trim():this.qstr.trim();
+      console.log("QQstring: " + Qstring)
+      const DesStr = this.setDesc(this.desOpt)
       const formData = {
         'QID': this.qid,
         'Qtype': this.qtype,
         'statement': this.qstate,
-        'string': this.qstr,
+        'string': Qstring,
         'options': JSON.stringify(this.textOpt),
-        'description': JSON.stringify(this.desOpt),
-        'category': this.topicStr,
+        'description': DesStr,
+        //'category': this.topicStr,
+        'category': "DO",
       }
       // const formData = {
       //   QID: this.qid,
@@ -234,16 +261,24 @@ export default {
       //   image: 'uploads/images/4333.png'
       // }
       console.log(JSON.stringify(formData))
-      await axios.post('/CRS/questions/', formData)
-        .then(response => {
-          this.success = true;
-        }).catch(error => {
-          console.log(error);
-          return false;
-        });
+      // await axios.post('/CRS/questions/', formData)
+      //   .then(response => {
+      //     this.success = true;
+      //   }).catch(error => {
+      //     console.log(error);
+      //     return false;
+      //   });
     },
     submit() {
-      this.getresult().then(response => {
+      this.validMC = true;
+      this.validOpt = true;
+      this.validStr = true;
+      this.validLen = true;
+      this.genID();
+
+      console.log(this.check())
+      if (this.check()) {
+        this.getresult().then(response => {
         this.submitForm().then(response => {
           setTimeout(() => {
 
@@ -263,11 +298,51 @@ export default {
           }, 1500)
         });
       });
+      }
+      
     },
     close: function (event) {
       this.success = false;
     },
+    check() {
+      var notValid = false;
+      if (this.qtype.length == 0) {
+        this.validMC = false;
+        notValid = true;
+      }
+      if (this.qtype == 'MC') {
+        for (let index = 0; index < this.textOpt[0].options.length; index++) {
+          const element = this.textOpt[0].options[index].data;
+          if (element.length < 1) {
+            this.validOpt = false;
+            notValid = true;
+          }
+        }
+      }
+      const tempStr = this.qstr.trim();
 
+      if (tempStr.length == 0) {
+        this.validStr = false;
+        notValid = true;
+      }
+      if (tempStr.length < 10 && tempStr.length > 0) {
+        this.validLen = false;
+        notValid = true;
+      }
+      if (notValid) {
+        return false
+      } else return true;
+    },
+    setDesc(arr) {
+      for (let index = 0; index < arr.length; index++) {
+          const data = arr[index].data;
+          const name = arr[index].name;
+          if (data.length < 1 || name.length < 1) {
+            return '';
+          }
+        }
+      return JSON.stringify(arr)
+    }
   }
 }
 </script>
