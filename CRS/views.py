@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from .models import Question, QuestionQuestion, QuestionInput, User, UserInfo
 from django.conf import settings
 from django.http import Http404, JsonResponse
+from django.core.files.storage import default_storage
 from rest_framework import permissions, authentication
 from django.shortcuts import render
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -35,6 +36,26 @@ def get_image(request, pk):
     my_model = Question.objects.get(QID=pk)
     image_path = os.path.join(settings.MEDIA_URL, str(my_model.image))
     return JsonResponse({'image_path': image_path})
+
+
+def upload_image(request, pk):
+    # Get the question object based on the provided primary key
+    question = Question.objects.get(QID=pk)
+    # try:
+    if request.method == 'POST' and request.FILES.get('image'):
+        image = request.FILES['image']
+        # Customize the path where the image will be stored
+        image_path = 'uploads/images/' + image.name
+        # Save the image to the desired path using default_storage
+        default_storage.save(image_path, image)
+        # Construct the URL of the uploaded image
+        image_url = image_path
+        # Update the question object with the image URL
+        question.image = image_url
+        question.save()
+        # Return a JSON response with the image URL
+        return JsonResponse({'image_url': image_url})
+    return JsonResponse({'success': False})
 
 
 def genSeqID(uid, sequence):
@@ -120,7 +141,7 @@ class QuestionAPI(APIView):
     def post(self, request, *args, **kwargs):
         question_data = request.data
         new_question = Question.objects.create(QID=question_data["QID"], statement=question_data["statement"], string=question_data["string"],
-                                               Qtype=question_data["Qtype"], description=question_data["description"], options=question_data["options"], image=question_data["image"], category=question_data["category"])
+                                               Qtype=question_data["Qtype"], description=question_data["description"], options=question_data["options"], category=question_data["category"])
         new_question.save()
         serializer = QuestionSerializer(new_question)
         return Response(serializer.data)

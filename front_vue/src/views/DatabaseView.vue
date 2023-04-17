@@ -78,7 +78,7 @@
             <div class="field">
               <label class="label">Options</label>
               <div class="control">
-                <div class="columns is-mobile" v-bind:key="o" v-for="o in textOpt">
+                <div class="columns is-mobile" v-bind:key="o" v-for="o in textOpt[0].options">
                   <div class="column is-narrow">
                     <p>{{ o.name }}.&nbsp;</p>
                   </div>
@@ -91,7 +91,7 @@
           </div>
           <div class="field is-grouped">
             <div class="control">
-              <button class="button is-link" @click.prevent="submitForm">Submit</button>
+              <button class="button is-link" @click.prevent="submit">Submit</button>
             </div>
             <div class="control">
               <button class="button is-link is-light" @click="reset">Cancel</button>
@@ -113,17 +113,16 @@ export default {
       topics: [{ "text": "Algorithm Design", "value": "ALGO" }, { "text": "Basic Machine Organisation", "value": "BMO" }, { "text": "Computer System", "value": "COM" }, { "text": "Data Manipulation and Analysis", "value": "DM" }, { "text": "Data Organisation and Data Control", "value": "DO" }, { "text": "Elementary Web Authoring", "value": "ELEWEB" }, { "text": "Health and Ethical Issues", "value": "HEALTH" }, { "text": "Information Processing", "value": "INFO" }, { "text": "Intellectual Property", "value": "IP" }, { "text": "Internet Services and Applications", "value": "NETSEV" }, { "text": "Multimedia Elements", "value": "MEDIA" }, { "text": "Networking and Internet Basics", "value": "NETBAS" }, { "text": "Program Development", "value": "PROGRAM" }, { "text": "Spreadsheets and Databases", "value": "SD" }, { "text": "Threats and Security on the Internet", "value": "THREAT" }],
       qtype: '',
       success: false,
-      uploadedImage: null,
-      imageName: '',
       qstate: '',
       qstr: '',
       qid: '',
       topicArr: [],
+      topicStr: '',
       imgFormData: '',
-      imgfile: null,
+      selectedImage: '',
       desOpt: [] = [{ "name": '', "data": '' }],
       DesList: '',
-      textOpt: [] = [{ "name": "A", "data": '' }, { "name": "B", "data": '' }, { "name": "C", "data": '' }, { "name": "D", "data": '' }],
+      textOpt: [] = [{ "type": "text", "options": [{ "name": "A", "data": '' }, { "name": "B", "data": '' }, { "name": "C", "data": '' }, { "name": "D", "data": '' }] }],
     }
   },
   mounted() {
@@ -145,15 +144,19 @@ export default {
       console.log("id: " + id)
       this.qid = id;
     },
-    uploadImage(event) {
-      this.imgfile = event.target.files[0];
-      this.imageName = 'uploads/images/' + this.qid.toString() + '.png'; // replace with your desired file name
-      // const formData = new FormData();
-      // formData.append('image', file, this.imageName);
+    async uploadImage() {
+      // Create a FormData object
+      this.selectedImage = this.$refs.fileInput.files[0];
+      this.imgFormData = new FormData();
+      this.imgFormData.append('image', this.selectedImage);
+      // const id = this.qid;
+      // // Use axios to make a POST request to your Django backend
+      console.log(this.imgFormData)
+
     },
     clearImage() {
-      this.uploadedImage = null;
-      this.imageName = '';
+      this.selectedImage = '';
+      this.imgFormData = '';
       this.$refs.fileInput.value = null; // clear the file input
     },
     reset() {
@@ -177,6 +180,7 @@ export default {
     },
     async getresult() {
       console.log(this.qstr)
+      this.topicArr = [];
       await axios.post('/modelapi/api', { 'text': this.qstr })
         .then(response => {
           console.log(response.data);
@@ -188,7 +192,9 @@ export default {
             }
           }
           // question.result = topics || "No result";
-          console.log(this.topicArr)
+          console.log(this.topicArr.length)
+          this.topicStr = this.topicArr.toString();
+          // console.log("topic arr: " + str)
           return true;
         }).catch(error => {
           console.log(error);
@@ -196,46 +202,67 @@ export default {
         });
     },
     async submitForm() {
-      console.log(this.desOpt)
-      console.log(this.textOpt)
-      console.log(this.imageName)
-      console.log(this.imgfile)
+      // console.log(this.desOpt)
+      // console.log(this.textOpt)
+      // console.log(this.imageName)
+      // console.log(this.imgfile)
 
-      const dData = {
-        type: "text",
-        options: [(this.textOpt)]
-      }
-      if (this.getresult()) {
-        // const formData = new FormData();
-        // formData.append('QID', this.qid);
-        // formData.append('statement', this.qstate);
-        // formData.append('string', this.qstr);
-        // formData.append('Qtype', this.qtype);
-        // formData.append('options', JSON.stringify(this.desOpt));
-        // formData.append('description', dData);
-        // formData.append('category', this.topicArr);
-        // formData.append('image', this.imgfile, this.imageName); // add the image file to the FormData object
-        // console.log(formData)
-        const formData = {
-          QID: this.qid,
-          statement: '',
-          string: 'What are the advantages of using the following calendar box over a text box for entering a date?',
-          Qtype: "MC",
-          options: "[{\"type\":\"text\",\"options\":[{\"name\":\"A\",\"data\":\"(1) and (2) only\"},{\"name\":\"B\",\"data\":\"(1) and (3) only\"},{\"name\":\"C\",\"data\":\"(2) and (3) only\"},{\"name\":\"D\",\"data\":\"(2) and (3)\"}]}]",
-          description: "[{\"name\":\"(1)\",\"data\":\"Avoids impossible dates.\"},{\"name\":\"(2)\",\"data\":\"Ensures that the input is error-free.\"},{\"name\":\"(3)\",\"data\":\"Provides a user-friendly interface.\"}]",
-          category: "DO",
-          image: 'uploads/images/4333.png'
-        }
-        console.log(JSON.stringify(formData))
-        await axios.post('/CRS/questions/', formData)
-          .then(response => {
-            this.success = true;
-          }).catch(error => {
-            console.log(error);
-            return false;
-          });
+      // console.log("JSON 1: " + JSON.stringify(this.desOpt))
+      // console.log("JSON 2: " + JSON.stringify(this.textOpt))
+      // console.log(this.qtype)
 
+      //let topic = this.getresult();
+      // const Topicarr = this.topicArr.toString();
+      // console.log(Topicarr)
+      const formData = {
+        'QID': this.qid,
+        'Qtype': this.qtype,
+        'statement': this.qstate,
+        'string': this.qstr,
+        'options': JSON.stringify(this.textOpt),
+        'description': JSON.stringify(this.desOpt),
+        'category': this.topicStr,
       }
+      // const formData = {
+      //   QID: this.qid,
+      //   statement: '',
+      //   string: 'What are the advantages of using the following calendar box over a text box for entering a date?',
+      //   Qtype: "MC",
+      //   options: "[{\"type\":\"text\",\"options\":[{\"name\":\"A\",\"data\":\"(1) and (2) only\"},{\"name\":\"B\",\"data\":\"(1) and (3) only\"},{\"name\":\"C\",\"data\":\"(2) and (3) only\"},{\"name\":\"D\",\"data\":\"(2) and (3)\"}]}]",
+      //   description: "[{\"name\":\"(1)\",\"data\":\"Avoids impossible dates.\"},{\"name\":\"(2)\",\"data\":\"Ensures that the input is error-free.\"},{\"name\":\"(3)\",\"data\":\"Provides a user-friendly interface.\"}]",
+      //   category: "DO",
+      //   image: 'uploads/images/4333.png'
+      // }
+      console.log(JSON.stringify(formData))
+      await axios.post('/CRS/questions/', formData)
+        .then(response => {
+          this.success = true;
+        }).catch(error => {
+          console.log(error);
+          return false;
+        });
+    },
+    submit() {
+      this.getresult().then(response => {
+        this.submitForm().then(response => {
+          setTimeout(() => {
+
+            if (this.success) {
+              axios.post(`/CRS/upload_image/${this.qid}/`, this.imgFormData)
+                .then(response => {
+                  // Handle success
+                  console.log('Image uploaded successfully');
+                  // Do something with the response, such as updating your data or displaying a success message
+                })
+                .catch(error => {
+                  // Handle error
+                  console.error('Failed to upload image', error);
+                  // Display an error message to the user
+                });
+            }
+          }, 1500)
+        });
+      });
     },
     close: function (event) {
       this.success = false;
