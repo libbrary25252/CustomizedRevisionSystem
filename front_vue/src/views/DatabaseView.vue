@@ -237,18 +237,24 @@ export default {
       //let topic = this.getresult();
       // const Topicarr = this.topicArr.toString();
       // console.log(Topicarr)
-      const Qstring = this.qstate.trim().length > 0? this.qstate.trim() + " " + this.qstr.trim():this.qstr.trim();
+      const Qstring = this.qstate.trim().length > 0 ? this.qstate.trim() + " " + this.qstr.trim() : this.qstr.trim();
       console.log("QQstring: " + Qstring)
       const DesStr = this.setDesc(this.desOpt)
+      let Opt = ''
+      if (this.qtype == 'MC') {
+        Opt = JSON.stringify(this.textOpt)
+      } else if (this.qtype == 'LQ') {
+        Opt = ''
+      }
       const formData = {
         'QID': this.qid,
         'Qtype': this.qtype,
         'statement': this.qstate,
         'string': Qstring,
-        'options': JSON.stringify(this.textOpt),
+        'options': Opt,
         'description': DesStr,
-        //'category': this.topicStr,
-        'category': "DO",
+        'category': this.topicStr,
+        //'category': "DO",
       }
       // const formData = {
       //   QID: this.qid,
@@ -261,13 +267,13 @@ export default {
       //   image: 'uploads/images/4333.png'
       // }
       console.log(JSON.stringify(formData))
-      // await axios.post('/CRS/questions/', formData)
-      //   .then(response => {
-      //     this.success = true;
-      //   }).catch(error => {
-      //     console.log(error);
-      //     return false;
-      //   });
+      await axios.post('/CRS/questions/', formData)
+        .then(response => {
+          this.success = true;
+        }).catch(error => {
+          console.log(error);
+          return false;
+        });
     },
     submit() {
       this.validMC = true;
@@ -279,27 +285,27 @@ export default {
       console.log(this.check())
       if (this.check()) {
         this.getresult().then(response => {
-        this.submitForm().then(response => {
-          setTimeout(() => {
+          this.submitForm().then(response => {
+            setTimeout(() => {
 
-            if (this.success) {
-              axios.post(`/CRS/upload_image/${this.qid}/`, this.imgFormData)
-                .then(response => {
-                  // Handle success
-                  console.log('Image uploaded successfully');
-                  // Do something with the response, such as updating your data or displaying a success message
-                })
-                .catch(error => {
-                  // Handle error
-                  console.error('Failed to upload image', error);
-                  // Display an error message to the user
-                });
-            }
-          }, 1500)
+              if (this.success) {
+                axios.post(`/CRS/upload_image/${this.qid}/`, this.imgFormData)
+                  .then(response => {
+                    // Handle success
+                    console.log('Image uploaded successfully');
+                    // Do something with the response, such as updating your data or displaying a success message
+                  })
+                  .catch(error => {
+                    // Handle error
+                    console.error('Failed to upload image', error);
+                    // Display an error message to the user
+                  });
+              }
+            }, 1500)
+          });
         });
-      });
       }
-      
+
     },
     close: function (event) {
       this.success = false;
@@ -335,12 +341,12 @@ export default {
     },
     setDesc(arr) {
       for (let index = 0; index < arr.length; index++) {
-          const data = arr[index].data;
-          const name = arr[index].name;
-          if (data.length < 1 || name.length < 1) {
-            return '';
-          }
+        const data = arr[index].data;
+        const name = arr[index].name;
+        if (data.length < 1 || name.length < 1) {
+          return '';
         }
+      }
       return JSON.stringify(arr)
     }
   }
